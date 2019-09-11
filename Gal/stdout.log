@@ -1,0 +1,52 @@
+Running in Lattice mode
+
+
+Starting:    C:\ispLEVER_Classic2_0\synpbase\win64\mbin\synbatch.exe
+Install:     C:\ispLEVER_Classic2_0\synpbase
+Date:        Wed Sep 11 13:38:55 2019
+Version:     I-2014.03LC 
+
+Arguments:   -product synplify_pro  -batch c:/users/petterok/desktop/pobyggern\address_decoder.prj
+ProductType: synplify_pro
+
+
+
+
+
+log file: "C:\users\petterok\desktop\pobyggern\address_decoder.srr"
+
+Running address_decoder|pobyggern
+
+Running: Compile on address_decoder|pobyggern
+
+Running: Compile Process on address_decoder|pobyggern
+
+Running: Compile Input on address_decoder|pobyggern
+Copied C:\users\petterok\desktop\pobyggern\synwork\address_decoder_comp.srs to C:\users\petterok\desktop\pobyggern\address_decoder.srs
+compiler Completed
+Return Code: 0
+Run Time:0h:00m:01s
+
+Running: Multi-srs Generator on address_decoder|pobyggern
+Copied C:\users\petterok\desktop\pobyggern\synwork\address_decoder_comp.srs to C:\users\petterok\desktop\pobyggern\synwork\address_decoder_s.srs
+multi_srs_gen Completed
+Return Code: 0
+Run Time:0h:00m:00s
+Copied C:\users\petterok\desktop\pobyggern\synwork\address_decoder_mult.srs to C:\users\petterok\desktop\pobyggern\address_decoder.srs
+Copied C:\users\petterok\desktop\pobyggern\address_decoder.srr to C:\users\petterok\desktop\pobyggern\address_decoder.srf
+Complete: Compile Process on address_decoder|pobyggern
+Complete: Compile on address_decoder|pobyggern
+
+Running: Map on address_decoder|pobyggern
+
+Running: Map & Optimize on address_decoder|pobyggern
+fpga_mapper Completed
+Return Code: 0
+Run Time:0h:00m:00s
+Complete: Map on address_decoder|pobyggern
+Complete: Logic Synthesis on address_decoder|pobyggern
+
+exit status=0
+
+exit status=0
+

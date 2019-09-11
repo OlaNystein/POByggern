@@ -1,0 +1,7 @@
+C:\ispLEVER_Classic2_0\synpbase\bin64\c_vhdl.exe  -osyn  C:\users\petterok\desktop\pobyggern\synwork\address_decoder_comp.srs  -top  address_decoder  -prodtype  synplify_pro  -nostructver -dfltencoding sequential -encrypt  -pro  -dmgen  C:\users\petterok\desktop\pobyggern\dm  -lite -ui -fid2 -ram -sharing on -ll 2000 -autosm -ignore_undefined_lib  -lib work C:\users\petterok\desktop\pobyggern\galpo.vhd -loga  C:\users\petterok\desktop\pobyggern\address_decoder.srr 
+rc:0 success:1
+C:\users\petterok\desktop\pobyggern\synwork\address_decoder_comp.srs|o|1568201935|1945
+C:\users\petterok\desktop\pobyggern\galpo.vhd|i|1568201916|908
+C:\users\petterok\desktop\pobyggern\address_decoder.srr|o|1568201935|1481
+C:\ispLEVER_Classic2_0\synpbase\bin\c_vhdl.exe|i|1401223898|2046976
+C:\ispLEVER_Classic2_0\synpbase\bin64\c_vhdl.exe|i|1401224104|5533184
