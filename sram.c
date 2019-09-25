@@ -1,5 +1,25 @@
-#include "SRAMtest.h"
+#include "sram.h"
 #include "uart.h"
+#include <avr/io.h>
+#include <stdio.h>
+
+int SRAM_init(void){
+    MCUCR |= (1<<SRE);
+    SFIOR |= (1<<XMM2);
+    return 0;
+}
+
+int SRAM_write(unsigned int address, unsigned int data){
+    volatile char *ext_ram = (char *) 0x1800;
+
+    ext_ram[address] = data;
+    return 0;
+}
+
+unsigned int SRAM_read(unsigned int address) {
+    volatile char *ext_ram = (char*) 0x1800;
+    return ext_ram[address];
+}
 
 void SRAM_test(void) {
     volatile char *ext_ram = (char *) 0x1800; // Start address for the SRAM

@@ -24,13 +24,13 @@ int joy_cal(void){
 int joy_button(int button){
     switch (button){
         case 0: //left button
-            if(!test_bit(PINB, PB0)) return 1;
+            if(test_bit(PINB, PB0)) {return 1;}
             break;
         case 1: //right button
-            if(!test_bit(PINB, PB1)) return 2;
+            if(test_bit(PINB, PB1)) {return 2;}
             break;
         case 2: //joybutton
-            if(!test_bit(PINB, PB2)) return 3;
+            if(test_bit(PINB, PB2)) {return 3;}
             break;
         default:
             break;
@@ -78,9 +78,9 @@ joy_position joy_getDir(void){
         pos.direction = "RIGHT";
     }
 
-    if(pos.y < 45){
+    if(pos.y < 30){
         pos.direction = "DOWN";
-    } else if(pos.y > 55){
+    } else if(pos.y > 70){
         pos.direction = "UP";
     }
 
@@ -97,7 +97,7 @@ slider_position joy_getSliderPos(void){
     l = ADC_read(3);
 
     pos.left = 100*l/256;
-    pos.rigth = 100*r/256;
+    pos.right = 100*r/256;
 
     return pos;
 }

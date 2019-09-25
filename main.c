@@ -2,14 +2,16 @@
 #define F_CPU 4915200UL
 #include "util/delay.h"
 #include "uart.h"
-#include "SRAMtest.h"
+#include "sram.h"
 #include "ADC.h"
 #include "joystick.h"
 #include "setup.h"
 #include "oled.h"
+#include "menu.h"
 #define FOSC 4915200UL
 #define BAUD 9600
 #define MYUBURR FOSC/16/BAUD-1
+
 
 int main(void){
     UART_Init(MYUBURR);
@@ -19,22 +21,54 @@ int main(void){
     //SRAM_test();
     //PORTA = 0x01;
     oled_init();
-   _delay_ms(1000);
+   _delay_ms(2000);
+   //oled_command(0xa5);
+   //oled_clear();
+   //oled_pos(1,4);
+   //oled_goto_line(0);
+  struct screen* main_menu = init_menu();
+  //printf("select: %d", main_menu->select);
+  
+   //oled_goto_line(2);
+   //oled_pos(1,10);
+   //oled_printString("Stokk");
+   //oled_clear_line(1);
+    int i = 0;
+    int j = 0;
+    joy_position pos;
+    //oled_printChar('A');
 
     
+    
     while(1){
-        //joy_position pos;
-        //pos = joy_getDir();
+        
+        pos = joy_getDir();
+        draw_screen(main_menu, pos.direction);
+        oled_refresh();
+        //printf("%s", pos.direction);
+        //if (pos.direction != "NEUTRAL"){
+        //    draw_screen(main_menu, pos.direction);
+        //}
+        //printf("%d", button_select(main_menu));
+        //button_select(main_menu);
+
         //printf("Joy pos\t x: %d\t y: %d\t dir: %s\n\r", pos.x, pos.y, pos.direction);
         //slider_position spos;
         //spos = joy_getSliderPos();
         //printf("Slidepos\tleft: %d\tright: %d\n\r", spos.left, spos.right);
         //volatile char *ext_ram = (char *) 0x1400;
         //ext_ram[0] = 1;
-     
-        //oled_command(0xa5);
-        //oled_printChar('a');
-        _delay_ms(1000);
+
+        /* oled_pos(j, i);
+        oled_printString("0123456789ABCDEF");
+        _delay_ms(500);
+        //oled_clear_line(j);
+        i++;
+        j++;
+        if (j == 8){j = 0;}
+        if (i == 16){i = 0;}
+        _delay_ms(1000);*/
+
         //PORTA ^= (1<<PA0);   
         //PORTE = ~(1<<PE1);
         //_delay_ms(500);
