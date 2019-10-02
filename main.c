@@ -8,6 +8,7 @@
 #include "setup.h"
 #include "oled.h"
 #include "menu.h"
+#include "SPI.h"
 #define FOSC 4915200UL
 #define BAUD 9600
 #define MYUBURR FOSC/16/BAUD-1
@@ -17,6 +18,7 @@ int main(void){
     UART_Init(MYUBURR);
     MCUCR |= (1<<SRE);
     SFIOR |= (1<<XMM2);
+    //sei();
     //ADC_init();
     //SRAM_test();
     //PORTA = 0x01;
@@ -37,14 +39,23 @@ int main(void){
     int j = 0;
     joy_position pos;
     //oled_printChar('A');
+    int* status = 0;
+        
 
-    
+    SPI_init();
     
     while(1){
-        
-        pos = joy_getDir();
-        draw_screen(main_menu, pos.direction);
-        oled_refresh();
+        printf("før");
+        SPI_select();
+        SPI_transmit('a');
+        SPI_deselect();
+        _delay_ms(500);
+        printf("etter");
+        //pos = joy_getDir();
+        //draw_screen(main_menu, pos.direction, &status);
+        //printf("%s", lastpos);
+        //oled_refresh();
+
         //printf("%s", pos.direction);
         //if (pos.direction != "NEUTRAL"){
         //    draw_screen(main_menu, pos.direction);

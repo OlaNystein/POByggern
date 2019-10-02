@@ -24,7 +24,11 @@ struct screen* init_menu(void){
     return &main_menu;
 }
 
-void draw_screen(struct screen* display, char* direction){
+void draw_screen(struct screen* display, char* direction, int* status){
+    if (direction == "NEUTRAL"){
+        *status  = 0;
+    }
+    printf("\n\rstatus: %d", *status);
     oled_sram_clear();
     oled_pos(0, 0);
     oled_sram_printString(main_menu.name);
@@ -35,13 +39,14 @@ void draw_screen(struct screen* display, char* direction){
     oled_pos(3, 2);
     oled_sram_printString("option3");
     //printf("%d", strcmp(direction, "UP"));
-
-    if(strcmp(direction, "UP") == 0)  {
+    if((strcmp(direction, "UP") == 0) && *status == 0)  {
+        *status = 1;
         if(display->select > 1){
             display->select = display->select -1;
             //printf("UP: %d\n\r", display->select);
         }
-    } else if(strcmp(direction, "DOWN") == 0){
+    } else if((strcmp(direction, "DOWN") == 0) && *status == 0){
+        *status = 1;
         if(display->select < 3){
             display->select = display->select + 1;
             //printf("DOWN: %d\r\n", display->select);

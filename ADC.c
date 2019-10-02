@@ -38,3 +38,4 @@ uint8_t ADC_read(uint8_t channel) {
     //_delay_us(1);
     return *adc;
 }
+
