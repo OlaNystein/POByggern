@@ -28,7 +28,7 @@ uint8_t MCP_read(uint8_t adress){
     SPI_transmit(MCP_READ);
     SPI_transmit(adress);
     
-    data = SPI_recieve();
+    uint8_t data = SPI_recieve();
     
     SPI_deselect();
     
@@ -46,7 +46,7 @@ int MCP_write(uint8_t data, uint8_t adress){
     return 0;
 }
 
-int MCP_RTS(uint8_t tx){
+int MCP_REQTS(uint8_t tx){
     if(tx < 8){
         tx = tx | MCP_RTS;
     }
@@ -65,7 +65,7 @@ int MCP_RTS(uint8_t tx){
 uint8_t MCP_RS(void){
     SPI_select();
     SPI_transmit(MCP_READ_STATUS);
-    res = SPI_recieve();
+    uint8_t res = SPI_recieve();
     SPI_deselect();
 
     return res;

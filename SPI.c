@@ -32,7 +32,6 @@ int SPI_transmit(char data){
 
 uint8_t SPI_recieve(void){
     SPI_transmit(0);
-
     return SPDR;
 }
 

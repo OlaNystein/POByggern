@@ -9,6 +9,9 @@
 #include "oled.h"
 #include "menu.h"
 #include "SPI.h"
+#include <avr/interrupt.h>
+#include "CAN.h"
+#include "MCP.h"
 #define FOSC 4915200UL
 #define BAUD 9600
 #define MYUBURR FOSC/16/BAUD-1
@@ -18,7 +21,7 @@ int main(void){
     UART_Init(MYUBURR);
     MCUCR |= (1<<SRE);
     SFIOR |= (1<<XMM2);
-    //sei();
+    sei();
     //ADC_init();
     //SRAM_test();
     //PORTA = 0x01;
@@ -40,17 +43,23 @@ int main(void){
     joy_position pos;
     //oled_printChar('A');
     int* status = 0;
-        
-
-    SPI_init();
+    message msg;
+    msg.ID = 51;
+    msg.length = 3;
+    msg.data[0] = 2;
+    msg.data[1] = 4;
+    msg.data[2] = 6;
+    CAN_init();
     
     while(1){
-        printf("før");
-        SPI_select();
-        SPI_transmit('a');
-        SPI_deselect();
+        
+        //CAN_send(&msg);
+        //message new = CAN_recieve();
+        printf("Interrupt flag for receieve: %d \r\n", MCP_read(MCP_CANINTF) & 0b01);
+        //printf("ID: %d\tDATA:%d\t%d\t%d\n\r", new.ID, new.data[0], new.data[1], new.data[2]);
+        
         _delay_ms(500);
-        printf("etter");
+   
         //pos = joy_getDir();
         //draw_screen(main_menu, pos.direction, &status);
         //printf("%s", lastpos);
