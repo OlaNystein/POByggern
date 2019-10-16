@@ -177,7 +177,7 @@ Copyright 2003 Kimberly Otten Software Consulting
 
 int MCP_init(void);
 int MCP_reset(void);
-int MCP_write(uint8_t data, uint8_t adress);
+int MCP_write(uint8_t adress, uint8_t data);
 uint8_t MCP_read(uint8_t adress);
 int MCP_REQTS(uint8_t tx);
 uint8_t MCP_RS(void);

@@ -18,7 +18,8 @@ int MCP_reset(void){
     SPI_transmit(MCP_RESET);
     
     SPI_deselect();
-    
+
+    _delay_ms(200);
     return 0;
 }
 
@@ -35,7 +36,7 @@ uint8_t MCP_read(uint8_t adress){
     return data;
 }
 
-int MCP_write(uint8_t data, uint8_t adress){
+int MCP_write(uint8_t adress, uint8_t data){
     SPI_select();
 
     SPI_transmit(MCP_WRITE);

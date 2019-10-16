@@ -9,10 +9,9 @@
 #include "sram.h"
 
 struct screen main_menu;
-static int joystick_push;
+
 
 struct screen* init_menu(void){
-    joystick_push = 0;
 
     main_menu.name = "---Main  Menu---";
     main_menu.parent = NULL;

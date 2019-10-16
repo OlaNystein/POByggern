@@ -13,18 +13,9 @@ int CAN_init(void){
 
     MCP_bit_modify(MCP_RXB0CTRL, 0b01100000, 0xFF); //recieve filter off
 
-    MCP_bit_modify(MCP_CANCTRL, MODE_MASK, MODE_LOOPBACK);
+    MCP_bit_modify(MCP_CANCTRL,MODE_MASK, MODE_NORMAL);
 
     //SPI_select();
-
-
-    MCP_write(MCP_CANCTRL, 0x1f);
-
-    _delay_ms(10);
-
-    uint8_t r = MCP_read(MCP_CANCTRL);
-    printf("Value of CANCTRL: %x \n\r", r);
-
 
     MCP_bit_modify(MCP_CANINTE, 0x01, 0x01);
 
@@ -56,6 +47,7 @@ int CAN_send(message* m){
             MCP_write(MCP_TXB0D0+i, m->data[i]);
         }
         MCP_REQTS(1); //requesting to send via TXB0
+        
 
     }
     else{
@@ -64,13 +56,13 @@ int CAN_send(message* m){
         }
     }
 
-    printf("Content of IDH: %d \n\r",  MCP_read(MCP_TXB0SIDH));
-    printf("Content of IDL: %d \n\r",  MCP_read(MCP_TXB0SIDL));
-    printf("Content of DL: %d \n\r",  MCP_read(MCP_TXB0DLC));
-    printf("Content of D[0]: %d \n\r",  MCP_read(MCP_TXB0D0));
+    printf("Content of IDH: %x \n\r",  MCP_read(MCP_TXB0SIDH));
+    printf("Content of IDL: %x \n\r",  MCP_read(MCP_TXB0SIDL));
+    printf("Content of DL: %x \n\r",  MCP_read(MCP_TXB0DLC));
+    printf("Content of D[0]: %x \n\r",  MCP_read(MCP_TXB0D0));
 
-    MCP_bit_modify(MCP_CANINTF, 0x01, 0x00);
-
+    //MCP_bit_modify(MCP_CANINTF, 0x01, 0x00);
+    
     return 0;
 }
 
@@ -87,44 +79,45 @@ int CAN_sendcomplete(void){
 
 message CAN_recieve(void){
     message m;
+    printf("rxF after send: %d\n\r", rxF);
 
 
 
-    printf("REC of IDH: %d \n\r",  MCP_read(MCP_RXB0SIDH));
-    printf("REC of IDL: %d \n\r",  MCP_read(MCP_RXB0SIDL));
-    printf("REC of DL: %d \n\r",  MCP_read(MCP_RXB0DLC));
-    printf("REC of D[0]: %d \n\r",  MCP_read(MCP_RXB0D0));
+    printf("REC of IDH: %x \n\r",  MCP_read(MCP_RXB0SIDH));
+    printf("REC of IDL: %x \n\r",  MCP_read(MCP_RXB0SIDL));
+    printf("REC of DL: %x \n\r",  MCP_read(MCP_RXB0DLC));
+    printf("REC of D[0]: %x \n\r",  MCP_read(MCP_RXB0D0));
     
     //checks if a message is pending, set to 1 by interrupt
-    //if (rxF == 1){ 
+    if (rxF == 1){ 
 
-        m.ID = (MCP_read((MCP_RXB0SIDH << 3) | (MCP_RXB0SIDL >> 5)));
+        m.ID = ((MCP_read(MCP_RXB0SIDH) << 3) | (MCP_read(MCP_RXB0SIDL) >> 5));
 
         m.length = (MCP_read(MCP_RXB0DLC) & 0x0F);
 
         for(uint8_t i = 0; i < m.length; i++){
             m.data[i] = MCP_read(MCP_RXB0D0+i);
         }
-
-      /*  rxF = 0; //message recieved
+        printf("message recieved\n\r");
+        rxF = 0; //message recieved
     }else{
         m.ID = -1; // message not received
     }
-    */
+    
 
     return m;
 
 }
 
 int CAN_interrupt(void){
+    MCP_bit_modify(MCP_CANINTF, 0x00, 0);
     MCP_bit_modify(MCP_CANINTF, 0x01, 0);
-    MCP_bit_modify(MCP_CANINTF, 0x04, 0);
     rxF = 1;
     return 0;
 }
 
 
 ISR(INT0_vect) {
-    _delay_ms(5);
+    printf("Interrupt!!!\n\r");
     CAN_interrupt();
 }
