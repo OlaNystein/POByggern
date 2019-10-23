@@ -21,7 +21,7 @@ int main(void){
     UART_Init(MYUBURR);
     MCUCR |= (1<<SRE);
     SFIOR |= (1<<XMM2);
-    sei();
+    
 
     //interrupt setup
 
@@ -39,22 +39,25 @@ int main(void){
 
   
    
-    int i = 0;
-    int j = 0;
+    joy_init();
     joy_position pos;
     int* status = 0;
     message msg;
-    msg.ID = 51;
+    msg.ID = 91;
     msg.length = 3;
     msg.data[0] = 2;
     msg.data[1] = 4;
     msg.data[2] = 6;
     CAN_init();
+    sei();
     
     
     while(1){
-        //CAN_init();
-        //CAN_send(&msg);
+        pos = joy_getPos();
+        printf("pos.x: %d pos.y : %d\n\r", pos.x, pos.y);
+        msg.data[0] = pos.x;
+        msg.data[1] = pos.y;
+        CAN_send(&msg);
         
         //message new = CAN_recieve();
         //printf("ID: %d\tDATA:%d\t%d\t%d\n\r", new.ID, new.data[0], new.data[1], new.data[2]);

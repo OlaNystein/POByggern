@@ -11,7 +11,7 @@ SCK - PB1
 */
 
 int SPI_init(void){
-    DDRB |= (1<<PB1) | (1<<PB2) | (1<<PB0); //setting SCK, MOSI, SS as output pins.
+    DDRB |= (1<<PB1) | (1<<PB2) | (1<<PB0) | (1<<PB7); //setting SCK, MOSI, SS as output pins.
 
     DDRB &= ~(1<<PB3); // setting MISO as input pin.
 
@@ -36,12 +36,12 @@ uint8_t SPI_recieve(void){
 }
 
 int SPI_select(void){
-    PORTB &= ~(1<<PB0);
+    PORTB &= ~(1<<PB7);
     return 0;
 }
 
 int SPI_deselect(void){
-    PORTB |= (1<<PB0);
+    PORTB |= (1<<PB7);
     return 0;
 }
 

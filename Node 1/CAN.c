@@ -60,6 +60,7 @@ int CAN_send(message* m){
     printf("Content of IDL: %x \n\r",  MCP_read(MCP_TXB0SIDL));
     printf("Content of DL: %x \n\r",  MCP_read(MCP_TXB0DLC));
     printf("Content of D[0]: %x \n\r",  MCP_read(MCP_TXB0D0));
+    printf("rxF after send: %d\n\r", rxF);
 
     //MCP_bit_modify(MCP_CANINTF, 0x01, 0x00);
     
@@ -79,7 +80,7 @@ int CAN_sendcomplete(void){
 
 message CAN_recieve(void){
     message m;
-    printf("rxF after send: %d\n\r", rxF);
+    
 
 
 

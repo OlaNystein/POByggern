@@ -60,6 +60,7 @@ int CAN_send(message* m){
     printf("Content of IDL: %d \n\r",  MCP_read(MCP_TXB0SIDL));
     printf("Content of DL: %d \n\r",  MCP_read(MCP_TXB0DLC));
     printf("Content of D[0]: %d \n\r",  MCP_read(MCP_TXB0D0));
+    printf("rxF after send: %d\n\r", rxF);
 
     //MCP_bit_modify(MCP_CANINTF, 0x01, 0x00);
     
@@ -79,7 +80,6 @@ int CAN_sendcomplete(void){
 
 message CAN_recieve(void){
     message m;
-    printf("rxF after send: %d\n\r", rxF);
 
 
 
@@ -90,7 +90,7 @@ message CAN_recieve(void){
     
     //checks if a message is pending, set to 1 by interrupt
     if (rxF == 1){ 
-
+        printf("Valid message received \n\r");
         m.ID = ((MCP_read(MCP_RXB0SIDH) << 3) | (MCP_read(MCP_RXB0SIDL) >> 5));
 
         m.length = (MCP_read(MCP_RXB0DLC) & 0x0F);
@@ -98,7 +98,6 @@ message CAN_recieve(void){
         for(uint8_t i = 0; i < m.length; i++){
             m.data[i] = MCP_read(MCP_RXB0D0+i);
         }
-
         rxF = 0; //message recieved
     }else{
         m.ID = -1; // message not received
