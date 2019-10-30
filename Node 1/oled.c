@@ -153,6 +153,7 @@ int oled_sram_clear(void){
 
 int oled_sram_print_char(char c){
     for (int i = 0; i < 8; i++){
+        
         SRAM_write(page*128+column+i, pgm_read_byte(&font8[c-' '][i]));
     }
     column += 8;

@@ -2,6 +2,6 @@
 #define ADC_H_
 
 int ADC_init(void);
-uint8_t ADC_read(uint8_t channel);
+uint16_t ADC_read(void);
 
 #endif

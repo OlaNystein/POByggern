@@ -7,35 +7,48 @@
 #include "setup.h"
 #include "ADC.h"
 #include "util/delay.h"
+#include <stdbool.h>
+#include <avr/interrupt.h>
+
+volatile bool ccF = false;
 
 int ADC_init(void) {
-    //MCUCR |= (1<<SRE);
-    //SFIOR |= (1<<XMM2);
 
-    DDRB &= ~(1<<PINB2);
+    DDRF &= ~(1 << PF0);
 
+    ADMUX |= (1 << REFS0);
+    ADMUX &= ~(1 << REFS1);
+
+    
+
+    //ADCSRA |= (1 << ADIE);
+    // | (1 << ADATE);
+    ADCSRA |= (1 << ADEN);
+    sei();
+    //ADCSRA |= (1 << ADSC);
+    
+    //ADCSRB |= (1 << ADTS0);
+    //ADCSRB &= ~(1 << ADTS0) & ~(1 << ADTS2);
     return 0;
 }
 
-/* 
-    Channel 0 -y
-    Channel 1 -x
-    Channel 2 -r-slider
-    Channel 3 -l-slider
- */
 
-uint8_t ADC_read(uint8_t channel) {
-    volatile char *adc = (char *) 0x1400; //1400
 
-    if (channel > 3) {return 0;}
-
-    *adc =  0x04 | channel;
-    //channel from 0 to 2
-
-    //while(test_bit(PINB, PINB2));
-    _delay_us(60);
-   // volatile uint8_t readout = adc[0];
-    //_delay_us(1);
-    return *adc;
+uint16_t ADC_read(void){
+    ADCSRA |= (1 << ADSC);
+    if (ccF == true){
+        ADCSRA |= (1 << ADSC);
+        ccF = false;
+        printf("Test");
+        return ADC;
+    }
+    return ADC;
 }
+
+ISR(ADC_vec){
+    ccF = true;
+}
+
+
+
 

@@ -56,11 +56,11 @@ int CAN_send(message* m){
         }
     }
 
-    printf("Content of IDH: %d \n\r",  MCP_read(MCP_TXB0SIDH));
+    /* printf("Content of IDH: %d \n\r",  MCP_read(MCP_TXB0SIDH));
     printf("Content of IDL: %d \n\r",  MCP_read(MCP_TXB0SIDL));
     printf("Content of DL: %d \n\r",  MCP_read(MCP_TXB0DLC));
     printf("Content of D[0]: %d \n\r",  MCP_read(MCP_TXB0D0));
-    printf("rxF after send: %d\n\r", rxF);
+    printf("rxF after send: %d\n\r", rxF);*/
 
     //MCP_bit_modify(MCP_CANINTF, 0x01, 0x00);
     
@@ -83,10 +83,10 @@ message CAN_recieve(void){
 
 
 
-    printf("REC of IDH: %d \n\r",  MCP_read(MCP_RXB0SIDH));
+    /* printf("REC of IDH: %d \n\r",  MCP_read(MCP_RXB0SIDH));
     printf("REC of IDL: %d \n\r",  MCP_read(MCP_RXB0SIDL));
     printf("REC of DL: %d \n\r",  MCP_read(MCP_RXB0DLC));
-    printf("REC of D[0]: %d \n\r",  MCP_read(MCP_RXB0D0));
+    printf("REC of D[0]: %d \n\r",  MCP_read(MCP_RXB0D0)); */
     
     //checks if a message is pending, set to 1 by interrupt
     if (rxF == 1){ 

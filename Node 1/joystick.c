@@ -72,19 +72,19 @@ joy_position joy_getDir(void){
 
     pos = joy_getPos();
 
-    if(pos.x < 45){
+    if(pos.x < -40){
         pos.direction = "LEFT";
-    } else if(pos.x > 55){
+    } else if(pos.x > 40){
         pos.direction = "RIGHT";
     }
 
-    if(pos.y < 30){
+    if(pos.y < -40){
         pos.direction = "DOWN";
-    } else if(pos.y > 70){
+    } else if(pos.y > 40){
         pos.direction = "UP";
     }
 
-    if(pos.x >= 45 && pos.x <= 55 && pos.y >= 45 && pos.y <= 55){
+    if(pos.x >= -10 && pos.x <= 10 && pos.y >= -10 && pos.y <= 10){
         pos.direction = "NEUTRAL";
     }
     return pos;

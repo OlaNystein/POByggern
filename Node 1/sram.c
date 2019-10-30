@@ -11,6 +11,7 @@ int SRAM_init(void){
 
 int SRAM_write(unsigned int address, unsigned int data){
     volatile char *ext_ram = (char *) 0x1800;
+    
 
     ext_ram[address] = data;
     return 0;

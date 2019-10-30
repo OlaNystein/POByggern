@@ -1,6 +1,8 @@
 #include <avr/io.h>
 #include "util/delay.h"
 #include "setup.h"
+#include "CAN.h"
+
 
 
 int pwm_init(void){
@@ -17,9 +19,17 @@ int pwm_init(void){
 
 }
 
-int pwm_pulse(unsigned int servo){
+unsigned int pwm_pulse(unsigned int servo, message m){
+    //printf("ID: %d\tDATA:%d\t%d\t%d\n\r", m.ID, m.data[0], m.data[1]);
+    if ((m.data[0] < 101 && m.data[0] > 5)&&(servo >= 1126  && servo <= 1181)){
+        servo++;
+    }
+    if ((m.data[0] < 250 && m.data[0] > 155)&&(servo >= 1130  && servo <= 1185)){
+        servo--;
+    }
     if(servo >= 1126  && servo <= 1185) {
         OCR1A = servo;
     }
-    return 0;
+    return servo;
 }
+

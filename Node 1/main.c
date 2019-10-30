@@ -18,6 +18,7 @@
 
 
 int main(void){
+    
     UART_Init(MYUBURR);
     MCUCR |= (1<<SRE);
     SFIOR |= (1<<XMM2);
@@ -31,38 +32,66 @@ int main(void){
 
     //ADC_init();
     //SRAM_test();
-    
+    SRAM_init();
     oled_init();
    _delay_ms(2000);
   
-  struct screen* main_menu = init_menu();
-
+  struct screen* menu = init_menu();
+  int i = 0;
+  while(menu->name[i] != '\0'){
+    printf("%c", menu->name[i]);
+    i++;
+  }
   
    
     joy_init();
     joy_position pos;
-    int* status = 0;
-    message msg;
-    msg.ID = 91;
-    msg.length = 3;
-    msg.data[0] = 2;
-    msg.data[1] = 4;
-    msg.data[2] = 6;
+    /*message msg;
+    msg.ID = 3;
+    msg.length = 2;*/
+    //msg.data[0] = 0;
+    int status = 0;
     CAN_init();
     sei();
-    
-    
+    SRAM_test();
     while(1){
-        pos = joy_getPos();
-        printf("pos.x: %d pos.y : %d\n\r", pos.x, pos.y);
-        msg.data[0] = pos.x;
+        pos = joy_getDir();
+        //printf("%d\t%d\r\n", button_select(menu), status);
+        
+        
+
+        
+
+        oled_refresh();
+
+        draw_screen(menu, pos.direction, &status);
+        
+        if(strcmp(pos.direction, "RIGHT")==0 && status == 0){
+            status = 1;
+            if(menu->child[menu->select] != NULL){
+                menu = menu->child[menu->select-1];
+            }
+        }
+        else if (strcmp(pos.direction, "LEFT")==0 && status == 0){
+            status = 1;
+            if(menu->parent != NULL){
+                menu = menu->parent;
+            }
+        }
+        /* while(menu->name[i] != '\0'){
+            printf("%c", menu->name[i]);
+            i++;
+        }*/
+
+        //printf("pos.x: %d pos.y : %d direction: %s buttonpress: %d\r\n", pos.x, pos.y, pos.direction, joy_button(1));
+        /* msg.data[0] = pos.x;
         msg.data[1] = pos.y;
-        CAN_send(&msg);
+        CAN_send(&msg);*/
         
         //message new = CAN_recieve();
         //printf("ID: %d\tDATA:%d\t%d\t%d\n\r", new.ID, new.data[0], new.data[1], new.data[2]);
         
-        _delay_ms(500);
+        _delay_ms(10);
    
         
     }

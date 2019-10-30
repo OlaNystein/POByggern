@@ -9,9 +9,14 @@
 #include "CAN.h"
 #include "MCP.h"
 #include "pwm.h"
+#include "game.h"
 #define FOSC F_CPU
 #define BAUD 9600
 #define MYUBURR FOSC/16/BAUD-1
+
+unsigned int servo = 1157;
+int score = 0;
+int detected_goal = 0;
 
 
 int main(void){
@@ -23,13 +28,10 @@ int main(void){
 
    sei();
 
-   message msg;
-    msg.ID = 99;
-    msg.length = 4;
-    msg.data[0] = 1;
-    msg.data[1] = 2;
-    msg.data[2] = 3;
-    msg.data[3] = 4;
+   
+
+
+  
 
    if (CAN_init()==0){
        printf("CAN working\n\r");
@@ -40,15 +42,20 @@ int main(void){
 
 
     pwm_init();
-    
+    ADC_init();
     
     
     while(1){
-        pwm_init();
-        _delay_ms(2000);
-        CAN_send(&msg);
         message m = CAN_recieve();
-        printf("ID: %d\tDATA:%d\t%d\t%d\n\r", m.ID, m.data[0], m.data[1], m.data[2]);
+        //printf("ID: %d\tDATA:%d\t%d\t%d\n\r", m.ID, m.data[0], m.data[1]);
+        servo = pwm_pulse(servo, m);
+
+        uint16_t d = ADC_read();
+        printf("%d\r\n", d);
+        
+        count_score(&score, d, &detected_goal);
+        printf("Score: %d\t Flag: %d\r\n", score, detected_goal);
+        
         //CAN_send(&msg);
         //message new = CAN_recieve();
         //printf("ID: %d\tDATA:%d\t%d\t%d\n\r", new.ID, new.data[0], new.data[1], new.data[2]);

@@ -2,6 +2,6 @@
 #define pwm_H_
 
 int pwm_init(void);
-int pwm_pulse(unsigned int servo);
+unsigned int pwm_pulse(unsigned int servo, message m);
 
 #endif
