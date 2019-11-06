@@ -10,6 +10,8 @@
 #include "MCP.h"
 #include "pwm.h"
 #include "game.h"
+#include "DAC.h"
+#include "controller.h"
 #define FOSC F_CPU
 #define BAUD 9600
 #define MYUBURR FOSC/16/BAUD-1
@@ -21,7 +23,7 @@ int detected_goal = 0;
 
 int main(void){
    UART_Init(MYUBURR); 
-   EIMSK |= (1 << INT0); //enable int0
+   EIMSK |= (1 << INT2); //enable int2
    EICRA |= (1 << ISC01); //trigger falling edge of interrupt
    EICRA &= ~(1 << ISC00); //trigger falling edge of interrupt
    CAN_init();
@@ -43,18 +45,21 @@ int main(void){
 
     pwm_init();
     ADC_init();
-    
+    DAC_init();
+    controller_init();
     
     while(1){
         message m = CAN_recieve();
         //printf("ID: %d\tDATA:%d\t%d\t%d\n\r", m.ID, m.data[0], m.data[1]);
         servo = pwm_pulse(servo, m);
+        //printf("%d\r\n", m.data[0]);
+        joy_to_voltage(m.data[0]);
 
-        uint16_t d = ADC_read();
+        /*uint16_t d = ADC_read();
         printf("%d\r\n", d);
         
         count_score(&score, d, &detected_goal);
-        printf("Score: %d\t Flag: %d\r\n", score, detected_goal);
+        printf("Score: %d\t Flag: %d\r\n", score, detected_goal);*/
         
         //CAN_send(&msg);
         //message new = CAN_recieve();

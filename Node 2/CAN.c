@@ -116,7 +116,7 @@ int CAN_interrupt(void){
 }
 
 
-ISR(INT0_vect) {
-    printf("Interrupt!!!\n\r");
+ISR(INT2_vect) {
+    //printf("Interrupt!!!\n\r");
     CAN_interrupt();
 }
