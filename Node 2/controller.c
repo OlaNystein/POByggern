@@ -5,49 +5,35 @@
 #include <stdlib.h>
 #include "DAC.h"
 #include <avr/interrupt.h>
+#include "uart.h"
 
 int controller_init(void){
     DDRH |= (1 << PH4);
-    DDRH |= (1 << PH1);
-    //DDRH &= ~(1 << DDH1);
+    DDRH &= ~(1 << PH1);
     DDRH |= (1<<PH3) | (1<<PH5) | (1 << PH6);
     PORTH |= (1 << PH4);
+    for(int i = 0; i<10000; i++){
+    DAC_send(100);
+    }
+    DDRH |= (1 << PH1);
+    printf("Controller initialized\r\n");
     return 0;
 }
 
-int two2dec(uint8_t twos) 
-{
-    int decimalNumber = 0, i = 0, remainder;
-    while (n!=0)
-    {
-        remainder = n%10;
-        n /= 10;
-        decimalNumber += remainder*pow(2,i);
-        ++i;
+int two2dec(uint8_t twos) {
+    if ((twos & 0x80) == 0){
+        return twos;
     }
-    return decimalNumber;
-
-    return sum;
+    return (uint8_t)(~(twos - 0x01))* -1;
 }
 
 void joy_to_voltage(uint8_t joy){
     int in = two2dec(joy);
-    printf("%d\r\n", in);
-    //if (joy < 101 && joy > 5)
     if(in >10){
-        //double inn = (joy/100)*150;
-        //printf("inn: %f\n\r", inn);
-        //int in = (int)(joy/100)*150;
-        //joy = 100;
-        //printf("in: %d\n\r", in);
         PORTH |= (1 << PH1);
         DAC_send(in);
     }
-    //else if (joy < 250 && joy > 155)
     else if (in < -10){
-        //int in = (int)((-joy+256)/100)*150;
-        //joy = 100;
-        //printf("in: %d\n\r", in);
         PORTH &= ~(1 << PH1);
         DAC_send(in*(-1));
     }
@@ -74,4 +60,24 @@ uint16_t controller_get_encoder_data(){
     sei();
 
     return data;
+}
+
+
+
+void init_timer(){
+	//Trigger interrupt with interval of 100hz FQ 
+	OCR3A = 10400;
+
+	//Enable CTC mode
+	TCCR3A |= (1 << COM3A0);
+
+	//Prescale 8
+	TCCR3B = (1 << CS31) | (1 << WGM32);	
+	
+	//Enable compare match A interrupt
+	EIMSK |= (1 << OCIE3A);
+}
+
+ISR(TIMER3_COMPA_vect)
+{
 }

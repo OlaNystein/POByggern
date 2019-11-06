@@ -28,7 +28,7 @@ int main(void){
    EICRA &= ~(1 << ISC00); //trigger falling edge of interrupt
    CAN_init();
 
-   sei();
+  
 
    
 
@@ -47,14 +47,15 @@ int main(void){
     ADC_init();
     DAC_init();
     controller_init();
-    
+    sei();
+    reg r;
     while(1){
         message m = CAN_recieve();
         //printf("ID: %d\tDATA:%d\t%d\t%d\n\r", m.ID, m.data[0], m.data[1]);
         servo = pwm_pulse(servo, m);
-        //printf("%d\r\n", m.data[0]);
+        //printf("%d\r\n", controller_get_encoder_data());
         joy_to_voltage(m.data[0]);
-
+        
         /*uint16_t d = ADC_read();
         printf("%d\r\n", d);
         

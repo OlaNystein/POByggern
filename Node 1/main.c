@@ -62,7 +62,7 @@ int main(void){
 
         
 
-        /*soled_refresh();
+        oled_refresh();
 
         draw_screen(menu, pos.direction, &status);
         
@@ -77,16 +77,19 @@ int main(void){
             if(menu->parent != NULL){
                 menu = menu->parent;
             }
-        }*/
+        }
+        if(joy_button(0)== 1){
+            printf("%d, du trykket\n\r");
+        };
         /* while(menu->name[i] != '\0'){
             printf("%c", menu->name[i]);
             i++;
         }*/
 
         //printf("pos.x: %d pos.y : %d direction: %s buttonpress: %d\r\n", pos.x, pos.y, pos.direction, joy_button(1));
-        msg.data[0] = pos.x;
+        /*msg.data[0] = pos.x;
         msg.data[1] = pos.y;
-        CAN_send(&msg);
+        CAN_send(&msg);*/
         
         //message new = CAN_recieve();
         //printf("ID: %d\tDATA:%d\t%d\t%d\n\r", new.ID, new.data[0], new.data[1], new.data[2]);
