@@ -6,16 +6,27 @@
 #include "DAC.h"
 #include <avr/interrupt.h>
 #include "uart.h"
+#include <math.h>
+#include "CAN.h"
+
+static int max, min, pos;
+static int lastError = 0;
+static int sumError = 0;
+static double Kp = 2.5;
+static double Ki = 6.5;
+static double T = 0.01;
+static double Kd = 0.1;
+
 
 int controller_init(void){
     DDRH |= (1 << PH4);
-    DDRH &= ~(1 << PH1);
+    DDRH |= (1 << PH1);
+    //DDRH &= ~(1 << PH1);
     DDRH |= (1<<PH3) | (1<<PH5) | (1 << PH6);
     PORTH |= (1 << PH4);
-    for(int i = 0; i<10000; i++){
-    DAC_send(100);
-    }
-    DDRH |= (1 << PH1);
+    
+    
+    
     printf("Controller initialized\r\n");
     return 0;
 }
@@ -42,8 +53,22 @@ void joy_to_voltage(uint8_t joy){
     }
 }
 
-uint16_t controller_get_encoder_data(){
-    uint16_t data;
+void joy_to_voltage2(int joy){
+    if(joy > 0){
+        PORTH |= (1 << PH1);
+        DAC_send(joy);
+    }
+    else if (joy < 0){
+        PORTH &= ~(1 << PH1);
+        DAC_send(joy*(-1));
+    }
+    else {
+        DAC_send(0);
+    }
+}
+
+int controller_get_encoder_data(void){
+    int data;
     cli();
     DDRK = 0x00;
     PORTH &= ~(1<<PH5); //enable output of encoder
@@ -63,7 +88,6 @@ uint16_t controller_get_encoder_data(){
 }
 
 
-
 void init_timer(){
 	//Trigger interrupt with interval of 100hz FQ 
 	OCR3A = 10400;
@@ -76,6 +100,51 @@ void init_timer(){
 	
 	//Enable compare match A interrupt
 	EIMSK |= (1 << OCIE3A);
+}
+
+void calibrate_encoder(void){
+    PORTH &= ~(1 << PH1);
+    for(int i = 0; i<10000; i++){
+    DAC_send(100);
+    }
+    min = -controller_get_encoder_data();
+    PORTH |= (1 << PH1);
+    for(int i = 0; i<10000; i++){
+    DAC_send(100);
+    }
+    max = -controller_get_encoder_data();
+    pos = max;
+    printf("min: %d, max: %d, pos: %d", min, max, pos);
+}
+
+void PID(message m){
+
+    double y = 100*((double)pos/((double)max-(double)min));
+    int error = m.data[3] - (int)y;
+
+    if(error < 0 && sumError > 0){
+        sumError = 0;
+    }else if(error > 0 && sumError < 0){
+        sumError = 0;
+    }
+    
+    sumError += error;
+
+    double derivator = (Kd/T)*(error-lastError);
+
+    lastError = error;
+    
+    
+    printf("%d\t%d\t%d\r\n", error, pos, sumError);
+    int u = Kp*error + sumError*Ki*T + derivator;
+    joy_to_voltage2(u);
+    pos = -controller_get_encoder_data();
+    if(pos > max){
+        pos = max;
+    }else if(pos < min){
+        pos = min;
+    }
+    _delay_ms(10);
 }
 
 ISR(TIMER3_COMPA_vect)

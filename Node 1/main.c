@@ -47,8 +47,10 @@ int main(void){
     joy_init();
     joy_position pos;
     message msg;
+    slider_position sli;
+    int left_button_press = 0;
     msg.ID = 3;
-    msg.length = 2;
+    msg.length = 5;
     //msg.data[0] = 0;
     int status = 0;
     CAN_init();
@@ -57,12 +59,15 @@ int main(void){
     while(1){
         pos = joy_getDir();
         //printf("%d\t%d\r\n", button_select(menu), status);
-        
-        
+        sli = joy_getSliderPos();
+        if(joy_button(0)){
+            left_button_press = 1;
+            printf("%d\r\n", left_button_press);
+        }      
 
         
 
-        oled_refresh();
+        /*oled_refresh();
 
         draw_screen(menu, pos.direction, &status);
         
@@ -81,15 +86,20 @@ int main(void){
         if(joy_button(0)== 1){
             printf("%d, du trykket\n\r");
         };
-        /* while(menu->name[i] != '\0'){
+        while(menu->name[i] != '\0'){
             printf("%c", menu->name[i]);
             i++;
         }*/
 
         //printf("pos.x: %d pos.y : %d direction: %s buttonpress: %d\r\n", pos.x, pos.y, pos.direction, joy_button(1));
-        /*msg.data[0] = pos.x;
+        msg.data[0] = pos.x;
         msg.data[1] = pos.y;
-        CAN_send(&msg);*/
+        msg.data[2] = sli.left;
+        msg.data[3] = sli.right;
+        msg.data[4] = left_button_press;
+        CAN_send(&msg);
+        msg.data[4] = 0;
+        left_button_press = 0;
         
         //message new = CAN_recieve();
         //printf("ID: %d\tDATA:%d\t%d\t%d\n\r", new.ID, new.data[0], new.data[1], new.data[2]);

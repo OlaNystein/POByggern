@@ -6,6 +6,7 @@
 #include <util/delay.h>
 #include <stdlib.h>
 #include "DAC.h"
+#include "CAN.h"
 #include <avr/interrupt.h>
 
 typedef struct reg_t{
@@ -15,8 +16,11 @@ typedef struct reg_t{
 
 int controller_init(void);
 void joy_to_voltage(uint8_t joy);
-uint16_t controller_get_encoder_data();
+int controller_get_encoder_data(void);
 int two2dec(uint8_t twos);
 void init_timer();
+void calibrate_encoder(void);
+void joy_to_voltage2(int joy);
+void PID(message m);
 
-#endif CONTROLLER_H_
+#endif 

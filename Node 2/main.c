@@ -12,6 +12,7 @@
 #include "game.h"
 #include "DAC.h"
 #include "controller.h"
+#include "solenoid.h"
 #define FOSC F_CPU
 #define BAUD 9600
 #define MYUBURR FOSC/16/BAUD-1
@@ -47,15 +48,21 @@ int main(void){
     ADC_init();
     DAC_init();
     controller_init();
+    calibrate_encoder();
+    //solenoid_init();
     sei();
-    reg r;
     while(1){
         message m = CAN_recieve();
+        //joy_to_voltage2(-100);
         //printf("ID: %d\tDATA:%d\t%d\t%d\n\r", m.ID, m.data[0], m.data[1]);
         servo = pwm_pulse(servo, m);
-        //printf("%d\r\n", controller_get_encoder_data());
-        joy_to_voltage(m.data[0]);
         
+        
+        //PID(m);
+        if(m.data[4]== 1){
+            printf("button: %d\n\r",m.data[4]);
+            solenoid_pulse();
+        }
         /*uint16_t d = ADC_read();
         printf("%d\r\n", d);
         
