@@ -14,7 +14,7 @@ int solenoid_init(void){
 
 int solenoid_pulse(void){ //run this when controller button press
     PORTB &= ~(1 << PB5);
-    _delay_ms(300);
+    _delay_ms(700);
     PORTB |= (1 << PB5);
     return 0;
 }

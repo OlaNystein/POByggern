@@ -9,7 +9,7 @@
 #include "sram.h"
 
 
-struct screen main_menu, play_game, high_scores, options;
+struct screen main_menu, play_game, high_scores, options, difficulty;
 
 
 struct screen* init_menu(void){
@@ -38,9 +38,15 @@ struct screen* init_menu(void){
     options.name = "options";
     options.parent = &main_menu;
     options.child[0] = NULL;
-    options.child[1] = NULL;
+    options.child[1] = &difficulty;
     options.child[2] = NULL;
     options.select = 1;
+
+    difficulty.name = "difficulty";
+    difficulty.parent = &options;
+    difficulty.child[0] = NULL;
+    difficulty.child[1] = NULL;
+    difficulty.child[1] = NULL;
 
     return &main_menu;
 }
@@ -137,7 +143,7 @@ void draw_screen(struct screen* display, char* direction, int* status){
         oled_pos(1,2);
         oled_sram_printString("Music");
         oled_pos(2, 2);
-        oled_sram_printString("Font");
+        oled_sram_printString("Difficulty");
         oled_pos(3, 2);
         oled_sram_printString("Back");
 

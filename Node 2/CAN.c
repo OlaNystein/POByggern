@@ -5,6 +5,8 @@
 #include "setup.h"
 #include <avr/interrupt.h>
 
+//can messages: 0 = joystick x, 1 = joystick y, 2 = slider left, 3 = slider right, 4 = left button, 5 = right button
+
 uint8_t rxF = 0;
 
 int CAN_init(void){

@@ -12,24 +12,20 @@
 #include <avr/interrupt.h>
 #include "CAN.h"
 #include "MCP.h"
+#include "game.h"
 #define FOSC 4915200UL
 #define BAUD 9600
 #define MYUBURR FOSC/16/BAUD-1
 
 
 int main(void){
-    
     UART_Init(MYUBURR);
     MCUCR |= (1<<SRE);
     SFIOR |= (1<<XMM2);
-    
-
     //interrupt setup
-
     GICR |= (1 << INT0); //enable int0
     MCUCR |= (1 << ISC01); //trigger falling edge of interrupt
     MCUCR &= ~(1 << ISC00); //trigger falling edge of interrupt
-
     //ADC_init();
     //SRAM_test();
     SRAM_init();
@@ -42,8 +38,7 @@ int main(void){
     printf("%c", menu->name[i]);
     i++;
   }
-  
-   
+
     joy_init();
     joy_position pos;
     message msg;
@@ -54,18 +49,14 @@ int main(void){
     CAN_init();
     sei();
     SRAM_test();
+
     while(1){
         pos = joy_getDir();
+        message from_node2;
+        from_node2 = CAN_recieve();
         //printf("%d\t%d\r\n", button_select(menu), status);
-        
-        
-
-        
-
         oled_refresh();
-
-        draw_screen(menu, pos.direction, &status);
-        
+        //draw_screen(menu, pos.direction, &status);
         if(strcmp(pos.direction, "RIGHT")==0 && status == 0){
             status = 1;
             if(menu->child[menu->select] != NULL){
@@ -78,6 +69,11 @@ int main(void){
                 menu = menu->parent;
             }
         }
+        if(menu->name == "game"){
+            play_game(&menu, from_node2);
+        }
+
+
         if(joy_button(0)== 1){
             printf("%d, du trykket\n\r");
         };

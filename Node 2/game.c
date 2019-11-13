@@ -34,8 +34,9 @@ int game_init(void){
 int play_game(message msg){
     game_init();
 
+    int servo = 1157;
     int score = 0;
-    int detected goal = 0;
+    int detected_goal = 0;
     int lives = 3;
     
     message to_node1;
@@ -44,17 +45,19 @@ int play_game(message msg){
     to_node1.data[0] = lives;
 
     while(lives){
-        //få inn styring av spillet
+        servo = pwm_pulse(servo, msg); //controlling the servo
+        //få inn controllering av motoren
 
-        if(msg[2] == 1){ //register left button press sent over CAN bus
+        if(msg[4] == 1){ //register left button press sent over CAN bus
             solenoid_pulse();
         }
-        uint16_t goal_signal = ADC_read()
+        uint16_t goal_signal = ADC_read() //detecting goals
         count_score(&score, goal_signal, &detected_goal);
         if(detected_goal == 1){
             lives = lives - score;
             to_node1.data[0] = lives;
-            CAN_send(&to_node1);//fjerne ett liv på oled skjermen!! kan det sendes over CAN bussen?
+            to_node1.data[1] = score;
+            CAN_send(&to_node1); //remove life on oled screen
             _delay_ms(1000); // ett lite delay før spillet kjører igjen
         }
         
@@ -62,6 +65,6 @@ int play_game(message msg){
 
     }
     to_node1[0] = 0; // setter lives = 0 
-    CAN_send(to_node1); // sender 0 liv til node 1, må printe you lost på oled skjermen
+    CAN_send(&to_node1); // sender 0 liv til node 1, må printe you lost på oled skjermen
 
 }

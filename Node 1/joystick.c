@@ -27,7 +27,7 @@ int joy_button(int button){
             if(test_bit(PINB, PB0)) {return 1;}
             break;
         case 1: //right button
-            if(test_bit(PINB, PB1)) {return 2;}
+            if(test_bit(PINB, PB1)) {return 1;}
             break;
         case 2: //joybutton
             if(test_bit(PINB, PB2)) {return 3;}
