@@ -20,9 +20,12 @@
 unsigned int servo = 1157;
 int score = 0;
 int detected_goal = 0;
-
+volatile message m;
+//volatile int solenoid_shot = 0;
+//volatile int counter = 0;
 
 int main(void){
+    cli();
    UART_Init(MYUBURR); 
    EIMSK |= (1 << INT2); //enable int2
    EICRA |= (1 << ISC01); //trigger falling edge of interrupt
@@ -43,25 +46,26 @@ int main(void){
        }
     
 
-
+    //init_timer();
     pwm_init();
     ADC_init();
     DAC_init();
     controller_init();
     calibrate_encoder();
-    //solenoid_init();
+    solenoid_init();
     sei();
     while(1){
-        message m = CAN_recieve();
+        m = CAN_recieve();
         //joy_to_voltage2(-100);
-        //printf("ID: %d\tDATA:%d\t%d\t%d\n\r", m.ID, m.data[0], m.data[1]);
+        //printf("DATA:%d\r\n",m.data[0]);
         servo = pwm_pulse(servo, m);
         
         
-        //PID(m);
-        if(m.data[4]== 1){
-            printf("button: %d\n\r",m.data[4]);
+        PID(m);
+        /*if(m.data[4]== 1){
             solenoid_pulse();
+            //printf("button: %d\n\r",m.data[4]);
+            //solenoid_shot = 1;
         }
         /*uint16_t d = ADC_read();
         printf("%d\r\n", d);
@@ -75,3 +79,21 @@ int main(void){
     }
     return 0;
 }
+
+
+/*ISR(TIMER3_COMPA_vect){
+    
+    //printf("interrupt\r\n");
+
+    PID(m);
+    
+    if(counter < 100 && solenoid_shot == 1){
+        counter++;
+    }else if(counter >= 100 && solenoid_shot == 1){
+        solenoid_pulse();
+        solenoid_shot = 0;
+        counter = 0;
+    }
+
+//TCNT3 = 0x00;
+}*/

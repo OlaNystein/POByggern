@@ -65,7 +65,7 @@ int main(void){
             printf("%d\r\n", left_button_press);
         }      
 
-        
+        printf("Slider right: %d\r\n", sli.right);
 
         /*oled_refresh();
 

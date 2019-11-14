@@ -13,8 +13,11 @@ int solenoid_init(void){
 }
 
 int solenoid_pulse(void){ //run this when controller button press
+    //cli();
     PORTB &= ~(1 << PB6);
     _delay_ms(700);
     PORTB |= (1 << PB6);
+    //sei();
     return 0;
+    
 }

@@ -8,6 +8,8 @@
 #include "uart.h"
 #include <math.h>
 #include "CAN.h"
+#include "solenoid.h"
+#define F_CPU 16000000
 
 static int max, min, pos;
 static int lastError = 0;
@@ -16,6 +18,8 @@ static double Kp = 2.5;
 static double Ki = 6.5;
 static double T = 0.01;
 static double Kd = 0.1;
+volatile int solenoid_shot = 0;
+volatile int counter = 0;
 
 
 int controller_init(void){
@@ -89,17 +93,19 @@ int controller_get_encoder_data(void){
 
 
 void init_timer(){
-	//Trigger interrupt with interval of 100hz FQ 
-	OCR3A = 10400;
+
 
 	//Enable CTC mode
-	TCCR3A |= (1 << COM3A0);
+	TCCR3A |= (1 << WGM31);
 
-	//Prescale 8
-	TCCR3B = (1 << CS31) | (1 << WGM32);	
+	//Prescale 1024
+	TCCR3B = (1 << CS32) | (1 << CS30);
+    OCR3A = 250;
 	
-	//Enable compare match A interrupt
-	EIMSK |= (1 << OCIE3A);
+	//Enable overflow interrupt 3
+	TIMSK3 |= (1 << OCIE3A);
+
+    TCNT3 = 0x00;
 }
 
 void calibrate_encoder(void){
@@ -114,11 +120,10 @@ void calibrate_encoder(void){
     }
     max = -controller_get_encoder_data();
     pos = max;
-    printf("min: %d, max: %d, pos: %d", min, max, pos);
+    printf("min: %d, max: %d, pos: %d\r\n", min, max, pos);
 }
 
 void PID(message m){
-
     double y = 100*((double)pos/((double)max-(double)min));
     int error = m.data[3] - (int)y;
 
@@ -135,7 +140,7 @@ void PID(message m){
     lastError = error;
     
     
-    printf("%d\t%d\t%d\r\n", error, pos, sumError);
+    //printf("%d\t%d\t%d\r\n", error, pos, sumError);
     int u = Kp*error + sumError*Ki*T + derivator;
     joy_to_voltage2(u);
     pos = -controller_get_encoder_data();
@@ -144,9 +149,16 @@ void PID(message m){
     }else if(pos < min){
         pos = min;
     }
+    counter++;
+    if(m.data[4] == 1){
+        solenoid_shot = 1;
+        if(counter >= 100){
+            solenoid_pulse();
+            counter = 0;
+            solenoid_shot = 0;
+        }
+    }
+    
     _delay_ms(10);
 }
 
-ISR(TIMER3_COMPA_vect)
-{
-}

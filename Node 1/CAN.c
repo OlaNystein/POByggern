@@ -37,7 +37,7 @@ int CAN_err(void){
 int CAN_send(message* m){
 
     if(CAN_sendcomplete()){
-        printf("Sending message \n\r");
+        //printf("Sending message \n\r");
         MCP_write(MCP_TXB0SIDH,(int8_t)(m->ID >> 3));
         MCP_write(MCP_TXB0SIDL, (int8_t)(m->ID << 5)); //puts 8-bit address in the right registers
 
