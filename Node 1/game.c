@@ -36,9 +36,11 @@ struct screen* start_game(struct screen* menu, char* direction, int* status){
         msg = CAN_recieve();
         if (msg.ID = 2){
             printf("lives: %d\n\r", msg.data[0]);
-            lives = msg.data[0];
+            if(lives > 0 && msg.data[0]){
+                lives = msg.data[0];
+            }
             //oled_sram_clear();
-            //menu = draw_screen(menu, joy_pos.direction, &status, lives);
+            menu = draw_screen(menu, joy_pos.direction, &status, lives);
         }
         // må motta meldinger
         oled_refresh();
@@ -48,7 +50,7 @@ struct screen* start_game(struct screen* menu, char* direction, int* status){
             left_button_press = 1;
         }
         if(joy_button(1)){ //right button
-            menu = draw_screen(menu, joy_pos.direction, &status);
+            menu = draw_screen(menu, joy_pos.direction, &status, lives);
             //menu = draw_screen(menu, direction, &status);
             int exit_pause = 0;
             _delay_ms(2000);
@@ -56,13 +58,13 @@ struct screen* start_game(struct screen* menu, char* direction, int* status){
                 oled_refresh();
                 joy_pos = joy_getDir();
                 if(joy_button(1)){
-                    menu = draw_screen(menu, joy_pos.direction, &status);
+                    menu = draw_screen(menu, joy_pos.direction, &status, lives);
                     exit_pause = 1;
                     _delay_ms(2000);
                     oled_refresh();
                 }
                 if(joy_button(0)){
-                    menu = draw_screen(menu, joy_pos.direction, &status);
+                    menu = draw_screen(menu, joy_pos.direction, &status, lives);
                     exit_pause = 1;
                     exit_game = 1;
                     _delay_ms(2000);

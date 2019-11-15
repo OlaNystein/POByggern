@@ -71,11 +71,11 @@ int main(void){
 
         //printf("Slider right: %d\r\n", sli.right);
 
-        menu = draw_screen(menu, pos.direction, &status);
+        menu = draw_screen(menu, pos.direction, &status, lives);
         oled_refresh();
 
        if(menu->name == "game"){
-            menu = draw_screen(menu, pos.direction, &status);
+            menu = draw_screen(menu, pos.direction, &status, lives);
             oled_refresh();
             menu = start_game(menu, pos.direction, &status);
         }
