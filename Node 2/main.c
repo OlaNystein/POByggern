@@ -16,13 +16,12 @@
 #define FOSC F_CPU
 #define BAUD 9600
 #define MYUBURR FOSC/16/BAUD-1
-
-unsigned int servo = 1157;
 int score = 0;
 int detected_goal = 0;
 volatile message m;
 //volatile int solenoid_shot = 0;
 //volatile int counter = 0;
+//unsigned int servo = 1155;
 
 int main(void){
     cli();
@@ -31,37 +30,30 @@ int main(void){
    EICRA |= (1 << ISC01); //trigger falling edge of interrupt
    EICRA &= ~(1 << ISC00); //trigger falling edge of interrupt
    CAN_init();
-
-  
-
-   
-
-
-  
-
    if (CAN_init()==0){
        printf("CAN working\n\r");
    }else{
        printf("CAN error\n\r");
        }
     
-
     //init_timer();
     pwm_init();
     ADC_init();
     DAC_init();
     controller_init();
-    calibrate_encoder();
+    printf("resets\n\r");
     solenoid_init();
     sei();
     while(1){
         m = CAN_recieve();
+        //m.data[0] = 6
+        printf("mdata id: %d    mdata data: %d \n\r", m.ID, m.data[4]);
+        if(m.ID == 1 && m.data[4] == 1){
+            //printf("starting game..\n\r");
+           start_game();
+        }
         //joy_to_voltage2(-100);
-        //printf("DATA:%d\r\n",m.data[0]);
-        servo = pwm_pulse(servo, m);
-        
-        
-        PID(m);
+        //printf("DATA:%d\r\n",(-m.data[0]+240)/3);
         /*if(m.data[4]== 1){
             solenoid_pulse();
             //printf("button: %d\n\r",m.data[4]);

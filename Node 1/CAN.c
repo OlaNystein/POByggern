@@ -99,7 +99,7 @@ message CAN_recieve(void){
         for(uint8_t i = 0; i < m.length; i++){
             m.data[i] = MCP_read(MCP_RXB0D0+i);
         }
-        printf("message recieved\n\r");
+        //printf("message recieved\n\r");
         rxF = 0; //message recieved
     }else{
         m.ID = -1; // message not received

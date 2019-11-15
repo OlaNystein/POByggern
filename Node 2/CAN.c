@@ -37,7 +37,7 @@ int CAN_err(void){
 int CAN_send(message* m){
 
     if(CAN_sendcomplete()){
-        printf("Sending message \n\r");
+        //printf("Sending message \n\r");
         MCP_write(MCP_TXB0SIDH,(int8_t)(m->ID >> 3));
         MCP_write(MCP_TXB0SIDL, (int8_t)(m->ID << 5)); //puts 8-bit address in the right registers
 
@@ -90,7 +90,7 @@ message CAN_recieve(void){
     
     //checks if a message is pending, set to 1 by interrupt
     if (rxF == 1){ 
-        printf("Valid message received \n\r");
+        //printf("Valid message received \n\r");
         m.ID = ((MCP_read(MCP_RXB0SIDH) << 3) | (MCP_read(MCP_RXB0SIDL) >> 5));
 
         m.length = (MCP_read(MCP_RXB0DLC) & 0x0F);

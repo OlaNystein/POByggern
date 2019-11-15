@@ -14,6 +14,6 @@
 
 #endif
 
-int count_score(int* score, int signal, int* detected_goal);
-int play_game(message msg);
+int count_score(int* score, int signal, int* detected_goal, int* lives);
+int start_game(void);
 

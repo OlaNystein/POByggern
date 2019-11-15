@@ -9,7 +9,7 @@
 #include "sram.h"
 
 
-struct screen main_menu, play_game, high_scores, options;
+struct screen main_menu, play_game, high_scores, options, pause_menu;
 
 
 struct screen* init_menu(void){
@@ -23,7 +23,7 @@ struct screen* init_menu(void){
 
     play_game.name = "game";
     play_game.parent = &main_menu;
-    play_game.child[0] = NULL;
+    play_game.child[0] = &pause_menu;
     play_game.child[1] = NULL;
     play_game.child[2] = NULL;
     play_game.select = 1;
@@ -42,13 +42,21 @@ struct screen* init_menu(void){
     options.child[2] = NULL;
     options.select = 1;
 
+    pause_menu.name = "pause_menu";
+    pause_menu.parent = &play_game;
+    pause_menu.child[0] = NULL;
+    pause_menu.child[1] = NULL;
+    pause_menu.child[2] = NULL;
+    pause_menu.select = 1;
+
     return &main_menu;
 }
 
-void draw_screen(struct screen* display, char* direction, int* status){
+struct screen* draw_screen(struct screen* display, char* direction, int* status){
     if (direction == "NEUTRAL"){
         *status  = 0;
     }
+    //*status = 0;
     //printf("yo\r\n");
     //printf("\n\rstatus: %d", *status);
     /* oled_sram_clear();
@@ -75,6 +83,26 @@ void draw_screen(struct screen* display, char* direction, int* status){
     }
     oled_pos(display->select, 0);
     oled_sram_print_char('X');*/
+    if(joy_button(1) && *status == 0 && strcmp(display->name, "game") == 0){
+        *status = 1;
+        if(display->child[0] != NULL){
+            display = display->child[0];
+        }
+    }
+    //printf("status %d, dir: %d\n\r", *status, *direction);
+    if(joy_button(1) &&  *status == 0 && strcmp(display->name, "pause_menu") == 0){
+        *status = 1;
+        if(display->parent != NULL){
+            display = display->parent;
+        }
+    }
+    if(joy_button(0) &&  *status == 0 && strcmp(display->name, "pause_menu") == 0){
+        *status = 1;
+        if(display->parent != NULL){
+            display = display->parent->parent;
+            display->select = 2;
+        }
+    }
 
     if (strcmp(display->name, "main") == 0){
         //printf("yo\r\n");
@@ -104,16 +132,37 @@ void draw_screen(struct screen* display, char* direction, int* status){
         oled_pos(display->select, 0);
         oled_sram_print_char('@');
     }
+
     else if (strcmp(display->name, "game") == 0){
         int i = 0;
-        
         oled_sram_clear();
         oled_pos(0, 0);
         oled_sram_printString("--Playing Game--");
         oled_pos(2, 1);
         oled_sram_printString("Lives: ###");
+        /*if(lives == 3){
+            oled_sram_printString("Lives: ###");
+        }
+        else if(lives == 2){
+            oled_sram_printString("Lives: ##");
+        }
+        else if(lives == 1){
+            oled_sram_printString("Lives: #");
+        }*/
         oled_pos(7, 1);
         oled_sram_printString("Score: 0");
+        display->select = -1;
+    }
+
+    else if (strcmp(display->name, "pause_menu") == 0){
+        int i = 0;
+        oled_sram_clear();
+        oled_pos(3, 3);
+        oled_sram_printString("Quit game?");
+        oled_pos(7, 0);
+        oled_sram_printString("Yes");
+        oled_pos(7, 14);
+        oled_sram_printString("No");
         display->select = -1;
     }
     else if (strcmp(display->name, "hs") == 0){
@@ -121,13 +170,13 @@ void draw_screen(struct screen* display, char* direction, int* status){
         oled_pos(0, 0);
         oled_sram_printString("--High  Scores--");
         oled_pos(1, 1);
-        oled_printString("1. Ola-------15");
+        oled_sram_printString("1. Ola-------15");
         oled_pos(2, 1);
-        oled_printString("2. Petter----12");
+        oled_sram_printString("2. Petter----12");
         oled_pos(7, 1);
-        oled_printString("Back");
+        oled_sram_printString("Back");
         oled_pos(7,0);
-        oled_printChar('@');
+        oled_sram_printString('@');
         display->select = -1;
     }
     else if (strcmp(display->name, "options") == 0){
@@ -154,11 +203,23 @@ void draw_screen(struct screen* display, char* direction, int* status){
                 //printf("DOWN: %d\r\n", display->select);
             }
         }
-        
         oled_pos(display->select, 0);
         oled_sram_print_char('@');
 
     }
+    if(strcmp(direction, "RIGHT") == 0 && *status == 0){
+        *status = 1;
+        if(display->child[display->select] != NULL){
+            display = display->child[display->select-1];
+        }
+        }
+    else if (strcmp(direction, "LEFT")==0 && *status == 0){
+        *status = 1;
+        if(display->parent != NULL){
+            display = display->parent;
+        }
+    }
+    return display;
 }
 
 int button_select(struct screen* display){

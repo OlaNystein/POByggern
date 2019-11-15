@@ -14,10 +14,14 @@
 static int max, min, pos;
 static int lastError = 0;
 static int sumError = 0;
-static double Kp = 2.5;
-static double Ki = 6.5;
+static double Kp = 1.5;
+/*static double Ki = 3.5;
 static double T = 0.01;
-static double Kd = 0.1;
+static double Kd = 0.1;*/
+//static double Kp = 0.5;
+static double Ki = 0;
+static double T = 0.01;
+static double Kd = 0;
 volatile int solenoid_shot = 0;
 volatile int counter = 0;
 
@@ -149,11 +153,12 @@ void PID(message m){
     }else if(pos < min){
         pos = min;
     }
+    printf("slider: %d min: %d, max: %d, pos: %d, error: %d, sumError: %d\r\n", m.data[3], min, max, pos, error, sumError);
     counter++;
     if(m.data[4] == 1){
         solenoid_shot = 1;
         if(counter >= 100){
-            solenoid_pulse();
+            //solenoid_pulse();
             counter = 0;
             solenoid_shot = 0;
         }

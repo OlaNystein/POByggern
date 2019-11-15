@@ -19,15 +19,20 @@ int pwm_init(void){
 
 }
 
+//1126 -1185
+
 unsigned int pwm_pulse(unsigned int servo, message m){
     //printf("ID: %d\tDATA:%d\t%d\t%d\n\r", m.ID, m.data[0], m.data[1]);
-    if ((m.data[0] < 101 && m.data[0] > 5)&&(servo >= 1126  && servo <= 1181)){
-        servo++;
+    if ((m.data[0] < 101 && m.data[0] > 15)){//&&(servo >= 1120  && servo <= 1181)){
+        servo = 1155 + -5+m.data[0]/3;
     }
-    if ((m.data[0] < 250 && m.data[0] > 155)&&(servo >= 1130  && servo <= 1185)){
-        servo--;
+    else if ((m.data[0] < 240 && m.data[0] > 150)){ //&&(servo >= 1123  && servo <= 1185)){
+        servo = 1155 - ((-m.data[0]+240)/3);
     }
-    if(servo >= 1126  && servo <= 1185) {
+    else{
+        servo = 1155;
+    }
+    if(servo >= 1119  && servo <= 1185) {
         OCR1A = servo;
     }
     return servo;

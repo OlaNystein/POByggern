@@ -1,5 +1,7 @@
 {
     "files.associations": {
-        "twi_master.h": "c"
+        "twi_master.h": "c",
+        "setup.h": "c",
+        "joystick.h": "c"
     }
 }

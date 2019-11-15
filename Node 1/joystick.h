@@ -1,5 +1,6 @@
 #ifndef JOYSTICK_H_
 #define JOYSTICK_H_
+#include <stdint.h>
 
 uint8_t mid_x, mid_y;
 
