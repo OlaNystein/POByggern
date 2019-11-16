@@ -45,12 +45,13 @@ int main(void){
     solenoid_init();
     sei();
     while(1){
+        //printf("vi er i main \n\r");
         m = CAN_recieve();
         //m.data[0] = 6
         printf("mdata id: %d    mdata data: %d \n\r", m.ID, m.data[4]);
         if(m.ID == 1 && m.data[4] == 1){
             //printf("starting game..\n\r");
-           start_game();
+            start_game(m);
         }
         //joy_to_voltage2(-100);
         //printf("DATA:%d\r\n",(-m.data[0]+240)/3);

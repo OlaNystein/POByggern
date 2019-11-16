@@ -7,7 +7,7 @@
 #include "menu.h"
 #include "joystick.h"
 #include "sram.h"
-
+#define F_CPU 4915200UL
 
 struct screen main_menu, play_game, high_scores, options, pause_menu;
 
@@ -103,6 +103,12 @@ struct screen* draw_screen(struct screen* display, char* direction, int* status,
             display->select = 2;
         }
     }
+    /*if(lives == 0 && *status == 0 && && strcmp(display->name, "game") == 0){
+        *status = 1;
+        if(display->parent != NULL){
+            display = display->parent;
+        }      
+    }*/
 
     if (strcmp(display->name, "main") == 0){
         //printf("yo\r\n");
@@ -138,6 +144,8 @@ struct screen* draw_screen(struct screen* display, char* direction, int* status,
         oled_sram_clear();
         oled_pos(0, 0);
         oled_sram_printString("--Playing Game--");
+        oled_pos(7, 1);
+        oled_sram_printString("Score: 0");
         oled_pos(2, 1);
         //oled_sram_printString("Lives: ###");
         if(lives == 3){
@@ -149,8 +157,15 @@ struct screen* draw_screen(struct screen* display, char* direction, int* status,
         else if(lives == 1){
             oled_sram_printString("Lives: #");
         }
-        oled_pos(7, 1);
-        oled_sram_printString("Score: 0");
+        else if(lives == 0){
+            oled_sram_clear();
+            oled_pos(3, 3);
+            oled_sram_printString("You lost!");
+            oled_pos(5,4);
+            oled_sram_printString("Score:0");
+            oled_pos(7, 0);
+            oled_sram_printString("Ok");
+        }
         display->select = -1;
     }
 
@@ -186,7 +201,7 @@ struct screen* draw_screen(struct screen* display, char* direction, int* status,
         oled_pos(1,2);
         oled_sram_printString("Music");
         oled_pos(2, 2);
-        oled_sram_printString("Font");
+        oled_sram_printString("Difficulty");
         oled_pos(3, 2);
         oled_sram_printString("Back");
 

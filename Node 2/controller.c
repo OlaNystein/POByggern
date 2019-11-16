@@ -153,7 +153,7 @@ void PID(message m){
     }else if(pos < min){
         pos = min;
     }
-    printf("slider: %d min: %d, max: %d, pos: %d, error: %d, sumError: %d\r\n", m.data[3], min, max, pos, error, sumError);
+    //printf("slider: %d min: %d, max: %d, pos: %d, error: %d, sumError: %d\r\n", m.data[3], min, max, pos, error, sumError);
     counter++;
     if(m.data[4] == 1){
         solenoid_shot = 1;

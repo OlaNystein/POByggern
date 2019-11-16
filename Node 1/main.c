@@ -75,9 +75,13 @@ int main(void){
         oled_refresh();
 
        if(menu->name == "game"){
+           printf("%s\n\r", menu->name);
             menu = draw_screen(menu, pos.direction, &status, lives);
             oled_refresh();
             menu = start_game(menu, pos.direction, &status);
+            //_delay_ms(2000);
+            //lives = 2;
+            //menu = draw_screen(menu, pos.direction, &status, lives);
         }
         //printf("%s\n\r", menu->name);
 
