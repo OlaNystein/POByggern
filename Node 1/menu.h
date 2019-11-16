@@ -10,7 +10,7 @@ typedef struct screen {
 } screen;
 
 struct screen* init_menu(void);
-struct screen* draw_screen(struct screen* display, char* direction, int* status, int lives);
+struct screen* draw_screen(struct screen* display, char* direction, int* status, int lives, int points);
 int button_select(struct screen* display);
 
 #endif

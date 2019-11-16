@@ -13,6 +13,8 @@
 #include "CAN.h"
 #include "MCP.h"
 #include "game.h"
+#include "music.h"
+
 #define FOSC 4915200UL
 #define BAUD 9600
 #define MYUBURR FOSC/16/BAUD-1
@@ -50,12 +52,14 @@ int main(void){
     //msg.data[0] = 0;
     int status = 0;
     int lives = 3;
+    int points = 0;
     CAN_init();
+    //PWM_init();
     sei();
 
     SRAM_test();
 
-
+    //PWM_note(2000);
 
 
 
@@ -71,14 +75,15 @@ int main(void){
 
         //printf("Slider right: %d\r\n", sli.right);
 
-        menu = draw_screen(menu, pos.direction, &status, lives);
+        menu = draw_screen(menu, pos.direction, &status, lives, points);
         oled_refresh();
 
        if(menu->name == "game"){
            printf("%s\n\r", menu->name);
-            menu = draw_screen(menu, pos.direction, &status, lives);
+            menu = draw_screen(menu, pos.direction, &status, lives, points);
             oled_refresh();
             menu = start_game(menu, pos.direction, &status);
+            //start_game();
             //_delay_ms(2000);
             //lives = 2;
             //menu = draw_screen(menu, pos.direction, &status, lives);

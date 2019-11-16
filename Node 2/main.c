@@ -13,6 +13,7 @@
 #include "DAC.h"
 #include "controller.h"
 #include "solenoid.h"
+#include "music.h"
 #define FOSC F_CPU
 #define BAUD 9600
 #define MYUBURR FOSC/16/BAUD-1
@@ -43,7 +44,10 @@ int main(void){
     controller_init();
     printf("resets\n\r");
     solenoid_init();
+    music_init();
     sei();
+    play_music(2);
+    //play_note(5000);
     while(1){
         //printf("vi er i main \n\r");
         m = CAN_recieve();
@@ -51,7 +55,7 @@ int main(void){
         printf("mdata id: %d    mdata data: %d \n\r", m.ID, m.data[4]);
         if(m.ID == 1 && m.data[4] == 1){
             //printf("starting game..\n\r");
-            start_game(m);
+            start_game();
         }
         //joy_to_voltage2(-100);
         //printf("DATA:%d\r\n",(-m.data[0]+240)/3);

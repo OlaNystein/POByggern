@@ -15,13 +15,13 @@ static int max, min, pos;
 static int lastError = 0;
 static int sumError = 0;
 static double Kp = 1.5;
-/*static double Ki = 3.5;
+static double Ki = 3.5;
 static double T = 0.01;
-static double Kd = 0.1;*/
+static double Kd = 0.001;
 //static double Kp = 0.5;
-static double Ki = 0;
+/*static double Ki = 0;
 static double T = 0.01;
-static double Kd = 0;
+static double Kd = 0;*/
 volatile int solenoid_shot = 0;
 volatile int counter = 0;
 
@@ -96,21 +96,6 @@ int controller_get_encoder_data(void){
 }
 
 
-void init_timer(){
-
-
-	//Enable CTC mode
-	TCCR3A |= (1 << WGM31);
-
-	//Prescale 1024
-	TCCR3B = (1 << CS32) | (1 << CS30);
-    OCR3A = 250;
-	
-	//Enable overflow interrupt 3
-	TIMSK3 |= (1 << OCIE3A);
-
-    TCNT3 = 0x00;
-}
 
 void calibrate_encoder(void){
     PORTH &= ~(1 << PH1);

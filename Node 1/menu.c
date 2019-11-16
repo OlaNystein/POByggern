@@ -52,7 +52,7 @@ struct screen* init_menu(void){
     return &main_menu;
 }
 
-struct screen* draw_screen(struct screen* display, char* direction, int* status, int lives){
+struct screen* draw_screen(struct screen* display, char* direction, int* status, int lives, int points){
     if (direction == "NEUTRAL"){
         *status  = 0;
     }
@@ -145,7 +145,7 @@ struct screen* draw_screen(struct screen* display, char* direction, int* status,
         oled_pos(0, 0);
         oled_sram_printString("--Playing Game--");
         oled_pos(7, 1);
-        oled_sram_printString("Score: 0");
+        //oled_sram_printString("Score: 0");
         oled_pos(2, 1);
         //oled_sram_printString("Lives: ###");
         if(lives == 3){
@@ -162,7 +162,11 @@ struct screen* draw_screen(struct screen* display, char* direction, int* status,
             oled_pos(3, 3);
             oled_sram_printString("You lost!");
             oled_pos(5,4);
-            oled_sram_printString("Score:0");
+            oled_sram_printString("Score:");
+            char result[50];
+            sprintf(result, "%d", points);
+            //printf("hihihihi_ %s\n\r", result);
+            oled_sram_printString(result);
             oled_pos(7, 0);
             oled_sram_printString("Ok");
         }

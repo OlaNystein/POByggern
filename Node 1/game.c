@@ -34,6 +34,7 @@ struct screen* start_game(struct screen* menu, char* direction, int* status){
     int lives_status = 0;
     int exit_game = 0;
     uint8_t live = 3;
+    int points = 0;
     //menu = draw_screen(menu, joy_pos.direction, &status, live);
     while(!exit_game){ 
         msg = CAN_recieve();
@@ -45,6 +46,7 @@ struct screen* start_game(struct screen* menu, char* direction, int* status){
         //menu = draw_screen(menu, joy_pos.direction, &status, live);
         
         printf("id: %d, data: %d\n\r", msg.ID, msg.data[1]);
+        points = msg.data[1];
         //lives = msg.data[0];
         //_delay_ms(2000);
         //live = 1;
@@ -58,7 +60,7 @@ struct screen* start_game(struct screen* menu, char* direction, int* status){
             }
             else{
                 live = msg.data[0];
-                menu = draw_screen(menu, joy_pos.direction, &status, live);
+                menu = draw_screen(menu, joy_pos.direction, &status, live, points);
             }
             //menu = draw_screen(menu, joy_pos.direction, &status, live);
             printf("menuname inside game: %s\n\r",menu->name);
@@ -81,7 +83,7 @@ struct screen* start_game(struct screen* menu, char* direction, int* status){
             left_button_press = 1;
         }
         if(joy_button(1)){ //right button
-            menu = draw_screen(menu, joy_pos.direction, &status, live);
+            menu = draw_screen(menu, joy_pos.direction, &status, live, points);
             //menu = draw_screen(menu, direction, &status);
             int exit_pause = 0;
             _delay_ms(2000);
@@ -90,13 +92,13 @@ struct screen* start_game(struct screen* menu, char* direction, int* status){
                 printf("menuname inside game: %s\n\r",menu->name);
                 joy_pos = joy_getDir();
                 if(joy_button(1)){
-                    menu = draw_screen(menu, joy_pos.direction, &status, live);
+                    menu = draw_screen(menu, joy_pos.direction, &status, live, points);
                     exit_pause = 1;
                     _delay_ms(2000);
                     oled_refresh();
                 }
                 if(joy_button(0)){
-                    menu = draw_screen(menu, joy_pos.direction, &status, live);
+                    menu = draw_screen(menu, joy_pos.direction, &status, live, points);
                     exit_pause = 1;
                     exit_game = 1;
                     _delay_ms(2000);
