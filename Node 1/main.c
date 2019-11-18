@@ -12,7 +12,7 @@
 #include <avr/interrupt.h>
 #include "CAN.h"
 #include "MCP.h"
-#include "game.h"
+//#include "game.h"
 //#include "music.h"
 
 #define FOSC 4915200UL
@@ -47,9 +47,9 @@ int main(void){
     message msg;
     slider_position sli;
     int left_button_press = 0;
-    msg.ID = 5;
+    msg.ID = 1;
     msg.length = 5;
-    //msg.data[0] = 0;
+    msg.data[0] = 4;
     int status = 0;
     int lives = 3;
     int points = 0;
@@ -62,7 +62,8 @@ int main(void){
 
 
     while(1){
-        printf("main\n\r");
+        //CAN_send(&msg);
+        //printf("main\n\r");
         pos = joy_getDir();
         //printf("%d\t%d\r\n", button_select(menu), status);
         sli = joy_getSliderPos();
@@ -91,7 +92,7 @@ int main(void){
            //printf("%s\n\r", menu->name);
             menu = draw_screen(menu, pos.direction, &status, lives, points);
             oled_refresh();
-            menu = start_game(menu, pos.direction, &status, difficulty);
+            //menu = start_game(menu, pos.direction, &status, difficulty);
             //_delay_ms(2000);
             //lives = 2;
             //menu = draw_screen(menu, pos.direction, &status, lives);

@@ -9,7 +9,7 @@
 #include "CAN.h"
 #include "MCP.h"
 #include "pwm.h"
-#include "game.h"
+//#include "game.h"
 #include "DAC.h"
 #include "controller.h"
 #include "solenoid.h"
@@ -45,20 +45,20 @@ int main(void){
     calibrate_encoder();
     //printf("resets\n\r");
     solenoid_init();
-    //music_init();
+    music_init();
     sei();
     while(1){
         //printf("vi er i main \n\r");
         m = CAN_recieve();
         //m.data[0] = 6
-        //printf("mdata id: %d    mdata data: %d \n\r", m.ID, m.data[4]);
+        //printf("mdata id: %d    mdata data: %d \n\r", m.ID, m.data[0]);
         if(m.ID == 5){
             //printf("play music: %d\n\r", m.data[0]);
             play_music(m.data[0]);
         }
         if(m.ID == 1 && m.data[4] == 1){
             //printf("starting game..\n\r");
-            start_game();
+            //start_game();
         }
         
     }

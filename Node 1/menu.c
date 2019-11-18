@@ -85,40 +85,14 @@ struct screen* draw_screen(struct screen* display, char* direction, int* status,
     if (direction == "NEUTRAL"){
         *status  = 0;
     }
-    //*status = 0;
-    //printf("yo\r\n");
-    //printf("\n\rstatus: %d", *status);
-    /* oled_sram_clear();
-    oled_pos(0, 0);
-    oled_sram_printString(main_menu.name);
-    oled_pos(1,2);
-    oled_sram_printString("option1");
-    oled_pos(2, 2);
-    oled_sram_printString("option2");
-    oled_pos(3, 2);
-    oled_sram_printString("option3");
-    if((strcmp(direction, "UP") == 0) && *status == 0)  {
-        *status = 1;
-        if(display->select > 1){
-            display->select = display->select -1;
-            //printf("UP: %d\n\r", display->select);
-        }
-    } else if((strcmp(direction, "DOWN") == 0) && *status == 0){
-        *status = 1;
-        if(display->select < 3){
-            display->select = display->select + 1;
-            //printf("DOWN: %d\r\n", display->select);
-        }
-    }
-    oled_pos(display->select, 0);
-    oled_sram_print_char('X');*/
+
     if(joy_button(1) && *status == 0 && strcmp(display->name, "game") == 0){
         *status = 1;
         if(display->child[0] != NULL){
             display = display->child[0];
         }
     }
-    //printf("status %d, dir: %d\n\r", *status, *direction);
+
     if(joy_button(1) &&  *status == 0 && strcmp(display->name, "pause_menu") == 0){
         *status = 1;
         if(display->parent != NULL){
@@ -140,7 +114,6 @@ struct screen* draw_screen(struct screen* display, char* direction, int* status,
     }*/
 
     if (strcmp(display->name, "main") == 0){
-        //printf("yo\r\n");
         oled_sram_clear();
         oled_pos(0, 0);
         oled_sram_printString("---Main  Menu---");
@@ -346,13 +319,13 @@ struct screen* draw_screen(struct screen* display, char* direction, int* status,
         
     }
 
-    if(strcmp(direction, "RIGHT") == 0 && *status == 0 && (display->name != "normal_diff" || display->name != "hard_diff")){
+    if(strcmp(direction, "RIGHT") == 0 && *status == 0 && (display->name != "normal_diff" || display->name != "hard_diff") && display->name != "game"){
         *status = 1;
         if(display->child[display->select-1] != NULL){
             display = display->child[display->select-1];
         }
         }
-    else if (strcmp(direction, "LEFT")==0 && *status == 0){
+    else if (strcmp(direction, "LEFT")==0 && *status == 0 && display->name != "game"){
         *status = 1;
         if(display->parent != NULL){
             display = display->parent;
