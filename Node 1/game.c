@@ -17,47 +17,30 @@ int game_init(void){
 }
 
 struct screen* start_game(struct screen* menu, char* direction, int* status, int difficulty){
-    message to_node2;
+    
     joy_position joy_pos;
     slider_position slider_pos;
-    int left_button_press = 0;
-    int start_game = 1;
+    
+    message to_node2;
     to_node2.ID = 1;
     to_node2.length = 6;
-    to_node2.data[4] = start_game;
     to_node2.data[5] = difficulty;
-    CAN_send(&to_node2);
-    joy_pos = joy_getDir();
-    slider_pos = joy_getSliderPos();
-    message msg;
+    //CAN_send(&to_node2);
+    //joy_pos = joy_getDir();
+    //slider_pos = joy_getSliderPos();
+    int left_button_press = 0;
+    int start_game = 1;
     status = 0;
     int lives_status = 0;
     int exit_game = 0;
-    uint8_t live = 3;
+    int live = 3;
     int points = 0;
 
+    message msg;
     while(!exit_game){ 
-        msg = CAN_recieve();
         oled_refresh();
-
-        left_button_press = 0;
-        to_node2.data[2] = left_button_press;
-  
-        points = msg.data[1];
-      
-        if (msg.ID == 2 && live!= msg.data[0] && msg.data[0] < 4 && msg.data[0] >= 0 && live != 0){
-      
-            if(lives_status == 0){
-                live = 3;
-                lives_status = 1;
-            }
-            else{
-                live = msg.data[0];
-                printf("hey\r\n");
-                menu = draw_screen(menu, joy_pos.direction, &status, live, points);
-            }
-        }
-        if(live == 0){
+    
+        if(live == 0){ // avslutter om liv == 0
             oled_refresh();
             while(!joy_button(0)){
             }
@@ -65,13 +48,28 @@ struct screen* start_game(struct screen* menu, char* direction, int* status, int
             menu = menu->parent;
             exit_game = 1;
             start_game = 0;
-            to_node2.data[4] = start_game;
-            
+            //to_node2.data[4] = start_game; 
         }
+
+        
+        joy_pos = joy_getDir();
+        slider_pos = joy_getSliderPos();
+        to_node2.data[0] = joy_pos.x;
+        to_node2.data[1] = joy_pos.y;
+        to_node2.data[3] = slider_pos.right;
+        to_node2.data[2] = left_button_press;
+        to_node2.data[4] = start_game;
+        CAN_send(&to_node2);
+
+        
+        left_button_press = 0;
+        to_node2.data[2] = left_button_press;
 
         if(joy_button(0) && exit_game != 1){
             left_button_press = 1;
         }
+
+
         if(joy_button(1)){ //right button
             menu = draw_screen(menu, joy_pos.direction, &status, live, points);
             int exit_pause = 0;
@@ -97,14 +95,26 @@ struct screen* start_game(struct screen* menu, char* direction, int* status, int
             }
 
         }
-        joy_pos = joy_getDir();
-        slider_pos = joy_getSliderPos();
-        to_node2.data[0] = joy_pos.x;
-        to_node2.data[1] = joy_pos.y;
-        to_node2.data[3] = slider_pos.right;
-        to_node2.data[2] = left_button_press;
         
-        CAN_send(&to_node2);
+        
+        if(CAN_recieve().ID == 2){
+            msg = CAN_recieve();
+            points = msg.data[1];
+        }
+        if (msg.ID == 2 && live!= msg.data[0] && msg.data[0] < 4 && msg.data[0] >= 0 && live != 0){
+
+            if(lives_status == 0){
+                live = 3;
+                lives_status = 1;
+            }
+            else{
+                live = msg.data[0];
+                //printf("hey\r\n");
+                menu = draw_screen(menu, joy_pos.direction, &status, live, points);
+            }
+        }
+
+
         //printf("id: %d, slider: %d\r\n", to_node2.ID, to_node2.data[3]);
     }
     //draw you lost screen

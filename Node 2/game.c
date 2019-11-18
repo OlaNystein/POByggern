@@ -29,69 +29,69 @@ int count_score(int* score, int signal, int* detected_goal, int* lives){
     return 0;
 }
 
-int game_init(void){
-    // draw et funny screen på lcd'en og fyr opp livene
-    // initialiser motorposisjon og enkoder
-    //initialiser alt rett og slett
-    return 0;
-}
-
 int start_game(void){
     //game_init();
+    message msg;
+    to_node1.ID = 2;
+    to_node1.length = 3;
+    to_node1.data[0] = lives;
+    message to_node1;
+    //_delay_us(60);
+
     int score = 0;
     int detected_goal = 0;
-    int lastscore = 0;
     int lives = 3;
     int shoot_status = 0;
     int shot_counter = 0;
     int points = 0;
-    message msg;
-    msg = CAN_recieve();
-    message to_node1;
-    to_node1.ID = 2;
-    to_node1.length = 3;
-    to_node1.data[0] = lives;
-    CAN_send(&to_node1);
-    calibrate_encoder();
-    int just_started = 1;
+    //int just_started = 1;
+    //CAN_send(&to_node1);
     //printf("run game: %d\n\r", msg.data[4]);
-    while(msg.data[4] == 1 || just_started == 1){
-        just_started = 0;
+    calibrate_encoder();
+    msg = CAN_recieve();
+    while(msg.ID = 1 && msg.data[4] == 1){ // || just_started == 1){
+        //just_started = 0;
+        if(CAN_recieve().ID == 1){
+            msg = CAN_recieve();
+            PID(msg);
+            servo = pwm_pulse(servo, msg);
+        }
+
         shot_counter++;
-        msg = CAN_recieve();
-        printf("rungame: %d\n\r", msg.data[4]);
         if(shot_counter > 60){
             shoot_status = 0;
         }
-        
-        //printf("exit: %d\n\r", msg.data[4]);
-        //printf("solenoid: %d\n\r", msg.data[2]);
-        //printf("run game: %d\n\r", msg.data[4]);
-        PID(msg);
-        servo = pwm_pulse(servo, msg);
-
-        if(msg.data[2] == 1 && shoot_status == 0){ //register left button press sent over CAN bus
+        if(msg.ID == 1 && msg.data[2] == 1 && shoot_status == 0){ //register left button press sent over CAN bus
             shoot_status = 1;
             shot_counter = 0;
             //printf("SHOOT\n\r");
             solenoid_pulse();
             points += 1;
         }
-        uint16_t goal_signal = ADC_read();
-        //printf("goal signal: %d\n\r", goal_signal);
 
+        //register goals
+        uint16_t goal_signal = ADC_read();
         count_score(&score, goal_signal, &detected_goal, &lives);
         to_node1.data[0] = lives;
         to_node1.data[1] = points;
-        if(detected_goal == 1){
+        if(detected_goal == 1 && goal_signal >= 220){
             CAN_send(&to_node1);
-            
+            detected_goal = 0;
         }
-        //printf("dg %d\r\n");
-        if (goal_signal >= 220 && detected_goal == 1){
-        //*detected_goal = 0;
-                detected_goal = 0;
-        }
+       
+        //printf("rungame: %d\n\r", msg.data[4]);
+
+        
+        //printf("exit: %d\n\r", msg.data[4]);
+        //printf("solenoid: %d\n\r", msg.data[2]);
+        //printf("run game: %d\n\r", msg.data[4]);
+
+
+
+        
+        //printf("goal signal: %d\n\r", goal_signal);
+
+
         //_delay_ms(500);
         //printf("lives: %d\n\r", to_node1.data[0]);
         //fjerne ett liv på oled skjermen!! kan det sendes over CAN bussen?

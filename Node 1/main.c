@@ -92,7 +92,7 @@ int main(void){
            //printf("%s\n\r", menu->name);
             menu = draw_screen(menu, pos.direction, &status, lives, points);
             oled_refresh();
-            //menu = start_game(menu, pos.direction, &status, difficulty);
+            menu = start_game(menu, pos.direction, &status, difficulty);
             //_delay_ms(2000);
             //lives = 2;
             //menu = draw_screen(menu, pos.direction, &status, lives);
