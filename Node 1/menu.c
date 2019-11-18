@@ -226,13 +226,13 @@ struct screen* draw_screen(struct screen* display, char* direction, int* status,
         oled_sram_print_char('@');
 
     }
-    if(strcmp(direction, "RIGHT") == 0 && *status == 0){
+    if(strcmp(direction, "RIGHT") == 0 && *status == 0 && display->name != "game"){
         *status = 1;
         if(display->child[display->select] != NULL){
             display = display->child[display->select-1];
         }
         }
-    else if (strcmp(direction, "LEFT")==0 && *status == 0){
+    else if (strcmp(direction, "LEFT")==0 && *status == 0 && display->name != "game"){
         *status = 1;
         if(display->parent != NULL){
             display = display->parent;

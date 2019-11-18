@@ -22,6 +22,7 @@ int count_score(int* score, int signal, int* detected_goal, int* lives){
         if(*lives > 0){
             *lives -= 1;
         }
+        printf("reallives: %d\r\n",*lives);
     }
     if (signal >= 220 && *detected_goal == 1){
         *detected_goal = 0;
@@ -54,7 +55,7 @@ int start_game(void){
     CAN_send(&to_node1);
     calibrate_encoder();
     int just_started = 1;
-    printf("run game: %d\n\r", msg.data[4]);
+    //printf("run game: %d\n\r", msg.data[4]);
     while(msg.data[4] == 1 || just_started == 1){
         just_started = 0;
         shot_counter++;

@@ -9,7 +9,7 @@ int pwm_init(void){
     TCCR1A |= (1 << COM1A1) | (1 << COM1A0) | (1 << WGM11); //setting OCnA/OCnB/OCnC on compare match and enables fast pwm
     TCCR1B |= (1 << WGM12) | (1 << WGM13); //enables fast pwm
     TCCR1B |= (1 << CS12); // setting clock select to clk/256 from prescaler
-    DDRB |= (1 << PINB5);
+    DDRB |= (1 << PB5);
 
     ICR1 = 1250; // pwm period of 20ms
 

@@ -44,9 +44,9 @@ int main(void){
     controller_init();
     printf("resets\n\r");
     solenoid_init();
-    music_init();
+    //music_init();
     sei();
-    play_music(2);
+    //play_music(2);
     //play_note(5000);
     while(1){
         //printf("vi er i main \n\r");
