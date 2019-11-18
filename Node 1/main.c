@@ -13,7 +13,7 @@
 #include "CAN.h"
 #include "MCP.h"
 #include "game.h"
-#include "music.h"
+//#include "music.h"
 
 #define FOSC 4915200UL
 #define BAUD 9600
@@ -47,43 +47,51 @@ int main(void){
     message msg;
     slider_position sli;
     int left_button_press = 0;
-    msg.ID = 3;
+    msg.ID = 5;
     msg.length = 5;
     //msg.data[0] = 0;
     int status = 0;
     int lives = 3;
     int points = 0;
+    int difficulty = 1;
     CAN_init();
-    //PWM_init();
     sei();
 
     SRAM_test();
 
-    //PWM_note(2000);
-
 
 
     while(1){
-
+        printf("main\n\r");
         pos = joy_getDir();
         //printf("%d\t%d\r\n", button_select(menu), status);
         sli = joy_getSliderPos();
         if(joy_button(0)){
             left_button_press = 1;
-            printf("%d\r\n", left_button_press);
+            //printf("%d\r\n", left_button_press);
         }      
 
         //printf("Slider right: %d\r\n", sli.right);
+        //printf("menu name: %s\n\r",menu->name);
 
         menu = draw_screen(menu, pos.direction, &status, lives, points);
         oled_refresh();
+        if(menu->name == "difficulty"){
+            if(strcmp(pos.direction, "RIGHT") == 0){
+                //printf("display select: %d \n\r", menu->select);
+                difficulty = menu->select;
+                //menu = draw_screen(menu, pos.direction, &status, lives, points);
+                //oled_refresh();
+                //_delay_ms(2000);
+                //menu = menu->parent;
+            }
+        }
 
        if(menu->name == "game"){
-           printf("%s\n\r", menu->name);
+           //printf("%s\n\r", menu->name);
             menu = draw_screen(menu, pos.direction, &status, lives, points);
             oled_refresh();
-            menu = start_game(menu, pos.direction, &status);
-            //start_game();
+            menu = start_game(menu, pos.direction, &status, difficulty);
             //_delay_ms(2000);
             //lives = 2;
             //menu = draw_screen(menu, pos.direction, &status, lives);

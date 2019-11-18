@@ -16,7 +16,7 @@ unsigned int servo = 1155;
 
 int count_score(int* score, int signal, int* detected_goal, int* lives){
     if (signal < 100 && signal > 0 && *detected_goal == 0){
-        printf("GOAL!!!\r\n");
+        //printf("GOAL!!!\r\n");
         *score += 1;
         *detected_goal = 1;
         if(*lives > 0){
@@ -54,7 +54,7 @@ int start_game(void){
     CAN_send(&to_node1);
     calibrate_encoder();
     int just_started = 1;
-    printf("run game: %d\n\r", msg.data[4]);
+    //printf("run game: %d\n\r", msg.data[4]);
     while(msg.data[4] == 1 || just_started == 1){
         just_started = 0;
         shot_counter++;
@@ -65,7 +65,7 @@ int start_game(void){
         msg = CAN_recieve();
         //printf("exit: %d\n\r", msg.data[4]);
         //printf("solenoid: %d\n\r", msg.data[2]);
-        printf("run game: %d\n\r", msg.data[4]);
+        //printf("run game: %d\n\r", msg.data[4]);
         PID(msg);
         servo = pwm_pulse(servo, msg);
 

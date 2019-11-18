@@ -16,15 +16,16 @@ int game_init(void){
     return 0;
 }
 
-struct screen* start_game(struct screen* menu, char* direction, int* status){
+struct screen* start_game(struct screen* menu, char* direction, int* status, int difficulty){
     message to_node2;
     joy_position joy_pos;
     slider_position slider_pos;
     int left_button_press = 0;
     int start_game = 1;
     to_node2.ID = 1;
-    to_node2.length = 5;
+    to_node2.length = 6;
     to_node2.data[4] = start_game;
+    to_node2.data[5] = difficulty;
     CAN_send(&to_node2);
     //to_node2.data[0] = 
     joy_pos = joy_getDir();
@@ -120,6 +121,7 @@ struct screen* start_game(struct screen* menu, char* direction, int* status){
         
         CAN_send(&to_node2);
         //printf("start game: %d \n\r", start_game);
+        printf("id: %d, slider: %d\r\n", to_node2.ID, to_node2.data[3]);
     }
     //draw you lost screen
     return menu;

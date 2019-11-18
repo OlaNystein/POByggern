@@ -115,6 +115,18 @@ void calibrate_encoder(void){
 void PID(message m){
     double y = 100*((double)pos/((double)max-(double)min));
     int error = m.data[3] - (int)y;
+    if(m.data[5] == 2){
+        Kp = 4.5;
+        Ki = 0;
+        T = 0.01;
+        Kd = 0;
+    }
+    else{
+        Kp = 1.5;
+        Ki = 3.5;
+        T = 0.01;
+        Kd = 0.001;
+    }
 
     if(error < 0 && sumError > 0){
         sumError = 0;
