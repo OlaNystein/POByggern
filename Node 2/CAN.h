@@ -11,7 +11,10 @@ typedef struct message_t{
 int CAN_init(void);
 int CAN_send(message* m);
 int CAN_sendcomplete(void);
+int get(void);
 message CAN_recieve(void);
 int CAN_interrupt(void);
 int CAN_err(void);
+message get_CAN(void);
+
 #endif

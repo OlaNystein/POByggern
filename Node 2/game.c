@@ -11,6 +11,7 @@
 #include "game.h"
 #include "joystick.h"
 #include "solenoid.h"
+#include "controller.h"
 
 unsigned int servo = 1155;
 
@@ -67,7 +68,7 @@ int start_game(void){
         //printf("exit: %d\n\r", msg.data[4]);
         //printf("solenoid: %d\n\r", msg.data[2]);
         //printf("run game: %d\n\r", msg.data[4]);
-        PID(msg);
+        //PID(msg);
         servo = pwm_pulse(servo, msg);
 
         if(msg.data[2] == 1 && shoot_status == 0){ //register left button press sent over CAN bus

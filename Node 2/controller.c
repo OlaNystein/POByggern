@@ -11,13 +11,14 @@
 #include "solenoid.h"
 #define F_CPU 16000000
 
-static int max, min, pos;
-static int lastError = 0;
-static int sumError = 0;
-static double Kp = 1.5;
-static double Ki = 3.5;
+volatile int max, min, pos, u, error;
+volatile int lastError = 0;
+volatile int sumError = 0;
+static double Kp = 6.5;
+static double Ki = 1;
 static double T = 0.01;
-static double Kd = 0.001;
+static double Kd = 0.005;
+volatile double y;
 //static double Kp = 0.5;
 /*static double Ki = 0;
 static double T = 0.01;
@@ -28,6 +29,7 @@ volatile int counter = 0;
 
 int controller_init(void){
     DDRH |= (1 << PH4);
+    PINH = ~(1 << PH4);
     DDRH |= (1 << PH1);
     //DDRH &= ~(1 << PH1);
     DDRH |= (1<<PH3) | (1<<PH5) | (1 << PH6);
@@ -37,6 +39,20 @@ int controller_init(void){
     
     printf("Controller initialized\r\n");
     return 0;
+}
+
+void timer_init(void){
+    TCCR5B |= (1 << WGM32); // CTC
+
+    //TCCR5A |= (1 << COM5A0);
+
+    OCR5A = 77; 
+
+    TCCR5B |= (1 << CS52) | (1 << CS50);
+
+    TIMSK5 |= (1 << OCIE5A);
+
+    TIFR5 |= (1 << OCF5A);
 }
 
 int two2dec(uint8_t twos) {
@@ -62,6 +78,12 @@ void joy_to_voltage(uint8_t joy){
 }
 
 void joy_to_voltage2(int joy){
+    if(joy > 255){
+        joy = 255;
+    }
+    if(joy < -255){
+        joy = -255;
+    }
     if(joy > 0){
         PORTH |= (1 << PH1);
         DAC_send(joy);
@@ -110,57 +132,75 @@ void calibrate_encoder(void){
     max = -controller_get_encoder_data();
     pos = max;
     printf("min: %d, max: %d, pos: %d\r\n", min, max, pos);
+    DAC_send(0);
 }
 
-void PID(message m){
-    double y = 100*((double)pos/((double)max-(double)min));
-    int error = m.data[3] - (int)y;
-    if(m.data[5] == 2){
-        Kp = 4.5;
-        Ki = 0;
-        T = 0.01;
-        Kd = 0;
-    }
-    else{
-        Kp = 1.5;
-        Ki = 3.5;
-        T = 0.01;
-        Kd = 0.001;
-    }
+int gety(void){
+    return sumError;
+}
 
-    if(error < 0 && sumError > 0){
-        sumError = 0;
-    }else if(error > 0 && sumError < 0){
-        sumError = 0;
-    }
-    
-    sumError += error;
+int getu(void){
+    return error;
+}
 
-    double derivator = (Kd/T)*(error-lastError);
+int getpos(void){
+    return pos;
+}
 
-    lastError = error;
-    
-    
-    //printf("%d\t%d\t%d\r\n", error, pos, sumError);
-    int u = Kp*error + sumError*Ki*T + derivator;
-    joy_to_voltage2(u);
-    pos = -controller_get_encoder_data();
-    if(pos > max){
-        pos = max;
-    }else if(pos < min){
-        pos = min;
-    }
-    //printf("slider: %d min: %d, max: %d, pos: %d, error: %d, sumError: %d\r\n", m.data[3], min, max, pos, error, sumError);
-    counter++;
-    if(m.data[4] == 1){
-        solenoid_shot = 1;
-        if(counter >= 100){
-            //solenoid_pulse();
-            counter = 0;
-            solenoid_shot = 0;
+
+void PID(){
+    if(get_CAN().ID == 1){
+        //cli();
+        y = 100*((double)pos/((double)max-(double)min));
+        error = get_CAN().data[3] - (int)y;
+        /*if(get_CAN().data[5] == 2){
+            Kp = 4.5;
+            Ki = 0;
+            T = 0.01;
+            Kd = 0;
+        }
+        else{
+            Kp = 1.5;
+            Ki = 2.5;
+            T = 0.01;
+            Kd = 0.001;
+        }*/
+
+        if(error < 0 && sumError > 0){
+            sumError = 0;
+        }else if(error > 0 && sumError < 0){
+            sumError = 0;
+        }
+        if(sumError >  200){
+            sumError = 200;
+        } else if (sumError < -200){
+            sumError = 200;
+        }
+        
+        sumError += error;
+
+        double derivator = (Kd/T)*(error-lastError);
+
+        lastError = error;
+        
+        
+        //printf("%d\t%d\t%d\r\n", error, pos, sumError);
+        u = Kp*error + sumError*Ki*T + derivator;
+        
+        pos = -controller_get_encoder_data();
+        if(pos > max){
+            pos = max;
+        }else if(pos < min){
+            pos = min;
         }
     }
-    
-    _delay_ms(10);
+    joy_to_voltage2(u);
+    //_delay_ms(10);
+    //sei();
 }
 
+ISR(TIMER5_COMPA_vect){
+    PID();
+    TIFR5 |= (1 << OCF5A);
+    //counter++;
+}
