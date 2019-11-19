@@ -12,16 +12,13 @@
 #define F_CPU 16000000
 
 static int max, min, pos, u;
-static int lastError = 0;
+static int lastY;
+static int lastDerivative = 0;
 static int sumError = 0;
-static double Kp = 1.5;
-static double Ki = 3.5;
+static double Kp = 0;
+static double Ki = 0;
 static double T = 0.01;
-static double Kd = 0.001;
-//static double Kp = 0.5;
-/*static double Ki = 0;
-static double T = 0.01;
-static double Kd = 0;*/
+static double Kd = 0.000;
 volatile int solenoid_shot = 0;
 volatile int counter = 0;
 
@@ -32,10 +29,7 @@ int controller_init(void){
     //DDRH &= ~(1 << PH1);
     DDRH |= (1<<PH3) | (1<<PH5) | (1 << PH6);
     PORTH |= (1 << PH4);
-    
-    
-    
-    printf("Controller initialized\r\n");
+
     return 0;
 }
 
@@ -126,36 +120,49 @@ void calibrate_encoder(void){
 
 }
 
-void PID(){
-    if(get_CAN().ID == 1){
-        double y = 100*((double)pos/((double)max-(double)min));
-        int error = get_CAN().data[3] - (int)y;
-        if(get_CAN().data[5] == 2){
-            Kp = 4.5;
-            Ki = 0;
-            T = 0.01;
-            Kd = 0;
-        }
-        else{
-            Kp = 1.5;
-            Ki = 3.5;
-            T = 0.01;
-            Kd = 0.001;
-        }
+void set_difficulty(message m){
+    if (m.data[5] == 1){
+        //difficulty normal
+        Kp = 11;
+        Ki = 2;
+        Kd = 2;
+    }
+    else if (m.data[5] == 2){
+        //difficulty hard
+        Kp = 1;
+        Ki = 10;
+        Kd = 0.002;
+    }
+}
 
+void PID(){
+    message msg = get_CAN();
+    if(msg.ID == 1){
+        double y = 100*((double)pos/((double)max-(double)min));
+        int error = msg.data[3] - (int)y;
         if(error < 0 && sumError > 0){
             sumError = 0;
         }else if(error > 0 && sumError < 0){
             sumError = 0;
         }
+        if(sumError > 1000){
+            sumError = 1000;
+        }
+        if(sumError < -1000){
+            sumError = -1000;
+        }
         
         sumError += error;
 
-        double derivator = (Kd/T)*(error-lastError);
+        double cutoff = 10;
+        double RC = 1.0/(cutoff*6.28);
+        double derivative = RC/(RC + T)*(lastDerivative + y - lastY);
+        lastY = y;
 
-        lastError = error;
+
+        lastDerivative = derivative;
         
-        u = Kp*error + sumError*Ki*T + derivator;
+        u = Kp*error + sumError*Ki*T - (Kd/RC)*derivative;
         
         pos = -controller_get_encoder_data();
         if(pos > max){
@@ -163,6 +170,7 @@ void PID(){
         }else if(pos < min){
             pos = min;
         }
+
     }    
     joy_to_voltage2(u);
 }

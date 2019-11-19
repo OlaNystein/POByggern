@@ -31,6 +31,7 @@ struct screen* start_game(struct screen* menu, char* direction, int* status, int
 
     message msg;
     while(!exit_game){ 
+        _delay_ms(50);
         oled_refresh();
     
         if(live == 0){ // avslutter om liv == 0
@@ -51,6 +52,7 @@ struct screen* start_game(struct screen* menu, char* direction, int* status, int
         to_node2.data[2] = left_button_press;
         to_node2.data[4] = start_game;
         CAN_send(&to_node2);
+
 
         
         left_button_press = 0;
@@ -82,26 +84,30 @@ struct screen* start_game(struct screen* menu, char* direction, int* status, int
                     oled_refresh();
                     start_game = 0;
                     to_node2.data[4] = start_game;
+                    CAN_send(&to_node2);
                 }
             }
 
         }
-        
-        if(CAN_recieve().ID == 2){
-            msg = CAN_recieve();
+        msg = get_CAN();
+        if(msg.ID == 2){
             points = msg.data[1];
         }
-        if (msg.ID == 2 && live!= msg.data[0] && msg.data[0] < 4 && msg.data[0] >= 0 && live != 0){
+        if (msg.ID == 2 && live!= msg.data[0] && msg.data[0] < 4 && msg.data[0] >= 0){
 
-            if(lives_status == 0){
-                live = 3;
+            if(lives_status == 0 && live == 3 && msg.data[0] != 3){
                 lives_status = 1;
+                live = 3;
+                _delay_ms(2999);
             }
+
             else{
                 live = msg.data[0];
                 menu = draw_screen(menu, joy_pos.direction, &status, live, points);
             }
         }
+
+        
     }
     return menu;
 }

@@ -12,8 +12,7 @@
 #include <avr/interrupt.h>
 #include "CAN.h"
 #include "MCP.h"
-#include "game2.h"
-//#include "music.h"
+#include "game.h"
 
 #define FOSC 4915200UL
 #define BAUD 9600
@@ -42,7 +41,6 @@ int main(void){
    
     joy_init();
     joy_position pos;
-    message msg;
  
     int status = 0;
     int lives = 3;
@@ -56,12 +54,13 @@ int main(void){
 
     while(1){
         pos = joy_getDir();
-           
+ 
         menu = draw_screen(menu, pos.direction, &status, lives, points);
         oled_refresh();
         if(menu->name == "difficulty"){
+            difficulty = menu->select;
             if(strcmp(pos.direction, "RIGHT") == 0){
-                difficulty = menu->select;
+            
                 menu = draw_screen(menu, pos.direction, &status, lives, points);
                 oled_refresh();
             }
@@ -71,7 +70,7 @@ int main(void){
             oled_refresh();
             menu = start_game(menu, pos.direction, &status, difficulty);
         }
-        _delay_ms(10);
+        _delay_ms(100);
     }
     return 0;
 }

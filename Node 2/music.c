@@ -94,7 +94,11 @@ void play_music(int songpick){
                     play_note(tetris_theme[treblenote]);
                     treblecounter = tetris_tempo[treblenote];
                 }
-                if ((i % 12) == 0){
+
+                if((i > 179) && (i < 193) && (i % 3 == 0)){
+                    solenoid_pulse();
+
+                } else if ((i % 12) == 0){
                     solenoid_pulse();
                 }
                 //basscounter--;

@@ -222,6 +222,8 @@ struct screen* draw_screen(struct screen* display, char* direction, int* status,
             msg.data[0] = display->select;
             CAN_send(&msg);
             msg.ID = -1;
+            _delay_ms(1000);
+            CAN_send(&msg);
         }
 
     }
@@ -252,13 +254,11 @@ struct screen* draw_screen(struct screen* display, char* direction, int* status,
         oled_sram_clear();
         oled_pos(3, 3);
         oled_sram_printString("Normal mode");
-        display->select = -1;
     }
     else if (strcmp(display->name, "hard_diff") == 0){
         oled_sram_clear();
         oled_pos(3, 3);
         oled_sram_printString("Hard mode");
-        display->select = -1;
     }
 
     if(strcmp(direction, "RIGHT") == 0 && *status == 0 && (display->name != "normal_diff" || display->name != "hard_diff") && display->name != "game"){

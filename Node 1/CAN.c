@@ -51,6 +51,7 @@ int CAN_send(message* m){
             return  -1;
         }
     }
+    _delay_ms(20);
     return 0;
 }
 

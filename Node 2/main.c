@@ -9,7 +9,7 @@
 #include "CAN.h"
 #include "MCP.h"
 #include "pwm.h"
-#include "game2.h"
+#include "game.h"
 #include "DAC.h"
 #include "controller.h"
 #include "solenoid.h"
@@ -20,9 +20,6 @@
 int score = 0;
 int detected_goal = 0;
 volatile message m;
-//volatile int solenoid_shot = 0;
-//volatile int counter = 0;
-//unsigned int servo = 1155;
 
 int main(void){
     cli();
@@ -47,13 +44,15 @@ int main(void){
     music_init();
     timer_init();
     sei();
-
+    
+    message msg;
     while(1){
- 
-        if(get_CAN().ID == 5){
-            play_music(get_CAN().data[0]);
+        msg = get_CAN();
+        if(msg.ID == 5){
+            play_music(msg.data[0]);
+            msg.ID = -1;
         }
-        if(get_CAN().ID == 1 && get_CAN().data[4] == 1){
+        if(msg.data[4] == 1){
             start_game();
         }
         _delay_ms(100);
