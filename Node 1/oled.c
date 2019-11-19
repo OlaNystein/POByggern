@@ -16,8 +16,7 @@ void oled_command(uint8_t command){
 
 int oled_init(void){
 
-    //MCUCR |= (1<<SRE);
-    //SFIOR |= (1<<XMM2);
+
 
     //Oppsett av oled
     oled_command(0xAE); //display off
@@ -43,9 +42,6 @@ int oled_init(void){
     oled_command(0xA6); //set normal display
     oled_command(0xAF); //display on
 
-    /*oled_command(0xB0); //Set page start address
-    oled_command(0x00); //Set lower column start address
-    oled_command(0x10); //Set higher column start address */
     
     oled_clear();
     oled_home();
@@ -82,7 +78,6 @@ int oled_goto_line(uint8_t line){
 }
 
 int oled_goto_col(uint8_t col){
-    //oled_home();
 
     if(col < 128/8){
         column = col*8;
@@ -174,7 +169,6 @@ void oled_refresh(void){
         oled_goto_line(i);
         for(int j = 0; j < 128; j++){
             *oled_data =  SRAM_read(i*128+j);
-            //printf("%d\r\n", SRAM_read(i*128+j));
         }
     }
 }

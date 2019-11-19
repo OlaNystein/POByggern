@@ -11,11 +11,6 @@
 #include "oled.h"
 
 
-int game_init(void){
-    //init lcd skjerm
-    return 0;
-}
-
 struct screen* start_game(struct screen* menu, char* direction, int* status, int difficulty){
     
     joy_position joy_pos;
@@ -25,9 +20,7 @@ struct screen* start_game(struct screen* menu, char* direction, int* status, int
     to_node2.ID = 1;
     to_node2.length = 6;
     to_node2.data[5] = difficulty;
-    //CAN_send(&to_node2);
-    //joy_pos = joy_getDir();
-    //slider_pos = joy_getSliderPos();
+
     int left_button_press = 0;
     int start_game = 1;
     status = 0;
@@ -48,9 +41,7 @@ struct screen* start_game(struct screen* menu, char* direction, int* status, int
             menu = menu->parent;
             exit_game = 1;
             start_game = 0;
-            //to_node2.data[4] = start_game; 
         }
-
         
         joy_pos = joy_getDir();
         slider_pos = joy_getSliderPos();
@@ -96,7 +87,6 @@ struct screen* start_game(struct screen* menu, char* direction, int* status, int
 
         }
         
-        
         if(CAN_recieve().ID == 2){
             msg = CAN_recieve();
             points = msg.data[1];
@@ -109,14 +99,9 @@ struct screen* start_game(struct screen* menu, char* direction, int* status, int
             }
             else{
                 live = msg.data[0];
-                //printf("hey\r\n");
                 menu = draw_screen(menu, joy_pos.direction, &status, live, points);
             }
         }
-
-
-        //printf("id: %d, slider: %d\r\n", to_node2.ID, to_node2.data[3]);
     }
-    //draw you lost screen
     return menu;
 }

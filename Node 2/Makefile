@@ -2,7 +2,7 @@
 SOURCE_FILES := main.c uart.c ADC.c setup.h SPI.c MCP.c CAN.c pwm.c game.c DAC.c TWI_Master.c controller.c solenoid.c music.c note.h song.h
 
 # Set this flag to "yes" (no quotes) to use JTAG; otherwise ISP (SPI) is used
-PROGRAM_WITH_JTAG := no
+PROGRAM_WITH_JTAG := yes
 
 # Feel free to ignore anything below this line
 PROGRAMMER := atmelice_isp

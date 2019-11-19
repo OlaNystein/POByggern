@@ -15,20 +15,11 @@ volatile bool ccF = false;
 int ADC_init(void) {
 
     DDRF &= ~(1 << PF0);
-
     ADMUX |= (1 << REFS0);
     ADMUX &= ~(1 << REFS1);
-
-    
-
-    //ADCSRA |= (1 << ADIE);
-    // | (1 << ADATE);
     ADCSRA |= (1 << ADEN);
     sei();
-    //ADCSRA |= (1 << ADSC);
-    
-    //ADCSRB |= (1 << ADTS0);
-    //ADCSRB &= ~(1 << ADTS0) & ~(1 << ADTS2);
+  
     return 0;
 }
 
@@ -39,7 +30,6 @@ uint16_t ADC_read(void){
     if (ccF == true){
         ADCSRA |= (1 << ADSC);
         ccF = false;
-        printf("Test");
         return ADC;
     }
     return ADC;

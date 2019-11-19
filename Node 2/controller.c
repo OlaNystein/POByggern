@@ -11,7 +11,7 @@
 #include "solenoid.h"
 #define F_CPU 16000000
 
-static int max, min, pos;
+static int max, min, pos, u;
 static int lastError = 0;
 static int sumError = 0;
 static double Kp = 1.5;
@@ -95,6 +95,20 @@ int controller_get_encoder_data(void){
     return data;
 }
 
+void timer_init(void){
+    TCCR5B |= (1 << WGM32); // CTC
+
+    //TCCR5A |= (1 << COM5A0);
+
+    OCR5A = 77; 
+
+    TCCR5B |= (1 << CS52) | (1 << CS50);
+
+    TIMSK5 |= (1 << OCIE5A);
+
+    TIFR5 |= (1 << OCF5A);
+}
+
 
 
 void calibrate_encoder(void){
@@ -109,58 +123,51 @@ void calibrate_encoder(void){
     }
     max = -controller_get_encoder_data();
     pos = max;
-    printf("min: %d, max: %d, pos: %d\r\n", min, max, pos);
+
 }
 
-void PID(message m){
-    double y = 100*((double)pos/((double)max-(double)min));
-    int error = m.data[3] - (int)y;
-    if(m.data[5] == 2){
-        Kp = 4.5;
-        Ki = 0;
-        T = 0.01;
-        Kd = 0;
-    }
-    else{
-        Kp = 1.5;
-        Ki = 3.5;
-        T = 0.01;
-        Kd = 0.001;
-    }
-
-    if(error < 0 && sumError > 0){
-        sumError = 0;
-    }else if(error > 0 && sumError < 0){
-        sumError = 0;
-    }
-    
-    sumError += error;
-
-    double derivator = (Kd/T)*(error-lastError);
-
-    lastError = error;
-    
-    
-    //printf("%d\t%d\t%d\r\n", error, pos, sumError);
-    int u = Kp*error + sumError*Ki*T + derivator;
-    joy_to_voltage2(u);
-    pos = -controller_get_encoder_data();
-    if(pos > max){
-        pos = max;
-    }else if(pos < min){
-        pos = min;
-    }
-    //printf("slider: %d min: %d, max: %d, pos: %d, error: %d, sumError: %d\r\n", m.data[3], min, max, pos, error, sumError);
-    counter++;
-    if(m.data[4] == 1){
-        solenoid_shot = 1;
-        if(counter >= 100){
-            //solenoid_pulse();
-            counter = 0;
-            solenoid_shot = 0;
+void PID(){
+    if(get_CAN().ID == 1){
+        double y = 100*((double)pos/((double)max-(double)min));
+        int error = get_CAN().data[3] - (int)y;
+        if(get_CAN().data[5] == 2){
+            Kp = 4.5;
+            Ki = 0;
+            T = 0.01;
+            Kd = 0;
         }
-    }
-    
-    _delay_ms(10);
+        else{
+            Kp = 1.5;
+            Ki = 3.5;
+            T = 0.01;
+            Kd = 0.001;
+        }
+
+        if(error < 0 && sumError > 0){
+            sumError = 0;
+        }else if(error > 0 && sumError < 0){
+            sumError = 0;
+        }
+        
+        sumError += error;
+
+        double derivator = (Kd/T)*(error-lastError);
+
+        lastError = error;
+        
+        u = Kp*error + sumError*Ki*T + derivator;
+        
+        pos = -controller_get_encoder_data();
+        if(pos > max){
+            pos = max;
+        }else if(pos < min){
+            pos = min;
+        }
+    }    
+    joy_to_voltage2(u);
 }
 
+ISR(TIMER5_COMPA_vect){
+    PID();
+    TIFR5 |= (1 << OCF5A);
+}

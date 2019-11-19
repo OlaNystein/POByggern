@@ -12,7 +12,7 @@
 #include <avr/interrupt.h>
 #include "CAN.h"
 #include "MCP.h"
-//#include "game.h"
+#include "game2.h"
 //#include "music.h"
 
 #define FOSC 4915200UL
@@ -34,87 +34,44 @@ int main(void){
     MCUCR &= ~(1 << ISC00); //trigger falling edge of interrupt
 
     ADC_init();
-    //SRAM_test();
     SRAM_init();
     oled_init();
    _delay_ms(2000);
   
-  struct screen* menu = init_menu();
-  int i = 0;  
+    struct screen* menu = init_menu();
    
     joy_init();
     joy_position pos;
     message msg;
-    slider_position sli;
-    int left_button_press = 0;
-    msg.ID = 1;
-    msg.length = 5;
-    msg.data[0] = 4;
+ 
     int status = 0;
     int lives = 3;
     int points = 0;
     int difficulty = 1;
+  
     CAN_init();
     sei();
 
     SRAM_test();
 
-
-
     while(1){
-        //CAN_send(&msg);
-        //printf("main\n\r");
         pos = joy_getDir();
-        //printf("%d\t%d\r\n", button_select(menu), status);
-        sli = joy_getSliderPos();
-        if(joy_button(0)){
-            left_button_press = 1;
-            //printf("%d\r\n", left_button_press);
-        }      
-
-        //printf("Slider right: %d\r\n", sli.right);
-        //printf("menu name: %s\n\r",menu->name);
-
+           
         menu = draw_screen(menu, pos.direction, &status, lives, points);
         oled_refresh();
         if(menu->name == "difficulty"){
             if(strcmp(pos.direction, "RIGHT") == 0){
-                //printf("display select: %d \n\r", menu->select);
                 difficulty = menu->select;
-                //menu = draw_screen(menu, pos.direction, &status, lives, points);
-                //oled_refresh();
-                //_delay_ms(2000);
-                //menu = menu->parent;
+                menu = draw_screen(menu, pos.direction, &status, lives, points);
+                oled_refresh();
             }
         }
-
        if(menu->name == "game"){
-           //printf("%s\n\r", menu->name);
             menu = draw_screen(menu, pos.direction, &status, lives, points);
             oled_refresh();
             menu = start_game(menu, pos.direction, &status, difficulty);
-            //_delay_ms(2000);
-            //lives = 2;
-            //menu = draw_screen(menu, pos.direction, &status, lives);
         }
-        //printf("%s\n\r", menu->name);
-
-        //printf("pos.x: %d pos.y : %d direction: %s buttonpress: %d\r\n", pos.x, pos.y, pos.direction, joy_button(1));
-        /*msg.data[0] = pos.x;
-        msg.data[1] = pos.y;
-        msg.data[2] = sli.left;
-        msg.data[3] = sli.right;
-        msg.data[4] = left_button_press;
-        CAN_send(&msg);
-        msg.data[4] = 0;
-        left_button_press = 0;*/
-        
-        //message new = CAN_recieve();
-        //printf("ID: %d\tDATA:%d\t%d\t%d\n\r", new.ID, new.data[0], new.data[1], new.data[2]);
-        
-        _delay_ms(100);
-   
-        
+        _delay_ms(10);
     }
     return 0;
 }

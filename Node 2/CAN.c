@@ -6,6 +6,7 @@
 #include <avr/interrupt.h>
 
 uint8_t rxF = 0;
+volatile message lastmessage;
 
 int CAN_init(void){
 
@@ -15,9 +16,8 @@ int CAN_init(void){
 
     MCP_bit_modify(MCP_CANCTRL,MODE_MASK, MODE_NORMAL);
 
-    //SPI_select();
-
     MCP_bit_modify(MCP_CANINTE, 0x01, 0x01);
+
 
     return 0;
 }
@@ -28,9 +28,6 @@ int CAN_err(void){
     if (test_bit(MCP_TXB0CTRL, 4)){
         return -1; //transmission error
     }
-    /*if (test_bit(MCP_TXB0CTRL, 5)){
-        return -2; //message lost arbitration
-    }*/
     return 0;
 }
 
@@ -46,6 +43,7 @@ int CAN_send(message* m){
         for (uint8_t i = 0; i < m->length; i++){
             MCP_write(MCP_TXB0D0+i, m->data[i]);
         }
+        _delay_ms(1);
         MCP_REQTS(1); //requesting to send via TXB0
         
 
@@ -56,13 +54,6 @@ int CAN_send(message* m){
         }
     }
 
-    /* printf("Content of IDH: %d \n\r",  MCP_read(MCP_TXB0SIDH));
-    printf("Content of IDL: %d \n\r",  MCP_read(MCP_TXB0SIDL));
-    printf("Content of DL: %d \n\r",  MCP_read(MCP_TXB0DLC));
-    printf("Content of D[0]: %d \n\r",  MCP_read(MCP_TXB0D0));
-    printf("rxF after send: %d\n\r", rxF);*/
-
-    //MCP_bit_modify(MCP_CANINTF, 0x01, 0x00);
     
     return 0;
 }
@@ -80,17 +71,9 @@ int CAN_sendcomplete(void){
 
 message CAN_recieve(void){
     message m;
-
-
-
-    /* printf("REC of IDH: %d \n\r",  MCP_read(MCP_RXB0SIDH));
-    printf("REC of IDL: %d \n\r",  MCP_read(MCP_RXB0SIDL));
-    printf("REC of DL: %d \n\r",  MCP_read(MCP_RXB0DLC));
-    printf("REC of D[0]: %d \n\r",  MCP_read(MCP_RXB0D0)); */
     
     //checks if a message is pending, set to 1 by interrupt
     if (rxF == 1){ 
-        //printf("Valid message received \n\r");
         m.ID = ((MCP_read(MCP_RXB0SIDH) << 3) | (MCP_read(MCP_RXB0SIDL) >> 5));
 
         m.length = (MCP_read(MCP_RXB0DLC) & 0x0F);
@@ -108,6 +91,10 @@ message CAN_recieve(void){
 
 }
 
+message get_CAN(void){
+    return lastmessage;
+}
+
 int CAN_interrupt(void){
     MCP_bit_modify(MCP_CANINTF, 0x00, 0);
     MCP_bit_modify(MCP_CANINTF, 0x01, 0);
@@ -117,6 +104,6 @@ int CAN_interrupt(void){
 
 
 ISR(INT2_vect) {
-    //printf("Interrupt!!!\n\r");
     CAN_interrupt();
+    lastmessage = CAN_recieve();
 }

@@ -19,8 +19,8 @@ void music_init(void){
     TCCR3A &= ~(1 << COM3A1) & ~(1 << WGM31) & ~(1 << WGM30) ;
     TCCR3B |= (1 << WGM32);
     TCCR3B &= ~(1 << WGM33); //set mode CTC, toggle OCR1A when compare match
-    TCCR3B |= (1 << CS30);// | (1 << CS30);
-    TCCR3B &= ~(1 << CS32) & ~(1 << CS31);// & ~(1 << CS10); //prescaler/1
+    TCCR3B |= (1 << CS30);
+    TCCR3B &= ~(1 << CS32) & ~(1 << CS31); //prescaler/1
 
     //init bass pwm
     //init treble pwm
@@ -31,19 +31,11 @@ void music_init(void){
     TCCR2B &= ~(1 << WGM23); //set mode CTC, toggle OCR1A when compare match
     TCCR2B |= (1 << CS21);// | (1 << CS41);
     TCCR2B &= ~(1 << CS22) & ~(1 << CS20);// & ~(1 << CS10); //prescaler/64*/
+
+    //bass works, but was out of available pwm-pins on node 2
 }
 
-/*void PWM_start(int play){
-    if(play == 1){
-        //prescale /8
-        TCCR1B |= (1 << CS11);// | (1 << CS10);
-        TCCR1B &= ~(1 << CS12) & ~(1 << CS12);
-    }
-    else{
-        //stop counter
-        TCCR1B &= ~(1 << CS10) & ~(1 << CS11) & ~(1 << CS12);
-    }
-}*/
+
 
 void play_note(unsigned int freq){
     if(freq == 0){
@@ -82,9 +74,7 @@ void play_music(int songpick){
                         //solenoid_pulse();
                     }
                 }
-                /*if(currNote == size-1){
-                    currNote = 0;
-                }*/
+ 
             }
             break;
         case 2:
@@ -110,26 +100,7 @@ void play_music(int songpick){
                 //basscounter--;
                 treblecounter--;
                 _delay_ms(500);
-                //play_bass(0);
-                //play_note(0);
-                //printf("note: %d\tcounter: %d\r\n", tetris_theme_bass[bassnote], basscounter);
             }
-            /*for(int currNote = 0; currNote < size; currNote++){
-                int length = 500*(tetris_tempo[currNote]);
-                play_note(tetris_theme[currNote]);
-                for (int i = 0; i < length; i++){
-                    _delay_ms(1);
-                    counter++;
-                    if(counter == 24*mariomspb){
-                        counter = 0;
-                        //solenoid_pulse();
-                    }
-                }
-                //if(currNote == size-1){
-                    //currNote = 0;
-                //}
-                printf("%d\r\n", currNote);
-            }*/
             break;
     }
     play_note(0);

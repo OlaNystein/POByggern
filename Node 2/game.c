@@ -30,13 +30,6 @@ int count_score(int* score, int signal, int* detected_goal, int* lives){
 }
 
 int start_game(void){
-    //game_init();
-    message msg;
-    to_node1.ID = 2;
-    to_node1.length = 3;
-    to_node1.data[0] = lives;
-    message to_node1;
-    //_delay_us(60);
 
     int score = 0;
     int detected_goal = 0;
@@ -44,16 +37,21 @@ int start_game(void){
     int shoot_status = 0;
     int shot_counter = 0;
     int points = 0;
-    //int just_started = 1;
-    //CAN_send(&to_node1);
-    //printf("run game: %d\n\r", msg.data[4]);
-    calibrate_encoder();
+
+    message msg;
+    message to_node1;
+    to_node1.ID = 2;
+    to_node1.length = 3;
+    to_node1.data[0] = lives;
+
+
+   
+
     msg = CAN_recieve();
-    while(msg.ID = 1 && msg.data[4] == 1){ // || just_started == 1){
-        //just_started = 0;
+    while(msg.ID = 1 && msg.data[4] == 1){
+
         if(CAN_recieve().ID == 1){
             msg = CAN_recieve();
-            PID(msg);
             servo = pwm_pulse(servo, msg);
         }
 
@@ -61,10 +59,9 @@ int start_game(void){
         if(shot_counter > 60){
             shoot_status = 0;
         }
-        if(msg.ID == 1 && msg.data[2] == 1 && shoot_status == 0){ //register left button press sent over CAN bus
+        if(msg.ID == 1 && msg.data[2] == 1 && shoot_status == 0){ 
             shoot_status = 1;
             shot_counter = 0;
-            //printf("SHOOT\n\r");
             solenoid_pulse();
             points += 1;
         }
@@ -78,29 +75,5 @@ int start_game(void){
             CAN_send(&to_node1);
             detected_goal = 0;
         }
-       
-        //printf("rungame: %d\n\r", msg.data[4]);
-
-        
-        //printf("exit: %d\n\r", msg.data[4]);
-        //printf("solenoid: %d\n\r", msg.data[2]);
-        //printf("run game: %d\n\r", msg.data[4]);
-
-
-
-        
-        //printf("goal signal: %d\n\r", goal_signal);
-
-
-        //_delay_ms(500);
-        //printf("lives: %d\n\r", to_node1.data[0]);
-        //fjerne ett liv på oled skjermen!! kan det sendes over CAN bussen?
-        //_delay_ms(2000); // ett lite delay før spillet kjører igjen
-        
-
-
     }
-    //to_node1.data[0] = 0; // setter lives = 0 
-    //CAN_send(&to_node1); // sender 0 liv til node 1, må printe you lost på oled skjermen
-
 }
